@@ -1,0 +1,15 @@
+{
+    "name": "blobbybob/systemboard",
+    "description": "Digital system for keeping track of boulders on a systemwall",
+    "type": "project",
+    "require": {
+        "slim/slim": "^4.4"
+    },
+    "license": "GPL-3.0-only",
+    "authors": [
+        {
+            "name": "Ben Swierzy",
+            "email": "author@digitalbread.de"
+        }
+    ]
+}
