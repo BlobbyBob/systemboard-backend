@@ -3,7 +3,9 @@
     "description": "Digital system for keeping track of boulders on a systemwall",
     "type": "project",
     "require": {
-        "slim/slim": "^4.4"
+        "slim/slim": "^4.4",
+        "slim/psr7": "^1.0",
+        "php-di/php-di": "^6.1"
     },
     "license": "GPL-3.0-only",
     "authors": [
