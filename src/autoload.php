@@ -24,7 +24,7 @@ function autoloadSystemboard($class)
     $parts = explode('\\', $class);
 
     if (count($parts) > 1 && $parts[0] == 'Systemboard') {
-        $lowerParts = array_map('strtolower', $parts);
+        $lowerParts = $parts;
         array_pop($lowerParts);
         $path = __DIR__ . DIRECTORY_SEPARATOR . implode(DIRECTORY_SEPARATOR, $lowerParts);
         require $path . DIRECTORY_SEPARATOR . array_pop($parts) . '.php';

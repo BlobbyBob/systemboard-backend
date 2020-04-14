@@ -20,28 +20,16 @@
 
 declare(strict_types=1);
 
-namespace Systemboard\Services;
 
-use PDO;
-use Slim\Psr7\Request;
-use Slim\Psr7\Response;
+namespace Systemboard\Entity;
 
-class HelloService
+
+class AbstractEntity
 {
+    protected bool $resolved;
 
-    private PDO $pdo;
-
-    public function __construct(PDO $pdo)
+    public function isResolved(): bool
     {
-        $this->pdo = $pdo;
-    }
-
-    public function get(Request $request, Response $response, $args)
-    {
-        $response->getBody()->write("Hello World!\n");
-
-        $stmt = $this->pdo->query('SELECT * FROM user WHERE id = 1');
-        $response->getBody()->write(print_r($stmt->fetch(), true));
-        return $response->withHeader("Content-Type", "text/plain");
+        return $this->resolved;
     }
 }

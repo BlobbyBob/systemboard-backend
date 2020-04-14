@@ -23,16 +23,16 @@ declare(strict_types=1);
 use Slim\Psr7\Request;
 use Slim\Psr7\Response;
 use systemboard\services\DefaultService;
-use Systemboard\Services\HelloService;
+use Systemboard\Services\WallService;
 
-$getHelloHandler = function (Request $request, Response $response, $args) {
+$getWallHandler = function (Request $request, Response $response, $args) {
     /** @var DefaultService $defaultService */
     $defaultService = $this->get('defaultService');
 
-    if ($this->has('helloService')) {
-        /** @var HelloService $helloService */
-        $helloService = $this->get('helloService');
-        return $helloService->get($request, $response, $args);
+    if ($this->has('wallService')) {
+        /** @var WallService $wallService */
+        $wallService = $this->get('wallService');
+        return $wallService->get($request, $response, $args);
     }
 
     return $defaultService->notImplemented($request, $response, $args);

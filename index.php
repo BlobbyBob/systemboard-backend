@@ -35,6 +35,7 @@ $app->addBodyParsingMiddleware();
 $app->addRoutingMiddleware();
 $app->addErrorMiddleware(true, true, true);
 
-$app->get('/hello', $getHelloHandler);
+$app->get('/wall', $getWallHandler);
+$app->get('/wall/{id}', $getWallHandler);
 
 $app->run();
