@@ -20,20 +20,18 @@
 
 declare(strict_types=1);
 
+namespace Systemboard\Services;
+
+
 use Slim\Psr7\Request;
 use Slim\Psr7\Response;
-use systemboard\services\DefaultService;
-use Systemboard\Services\HelloService;
 
-$getHelloHandler = function (Request $request, Response $response, $args) {
-    /** @var DefaultService $defaultService */
-    $defaultService = $this->get('defaultService');
-
-    if ($this->has('helloService')) {
-        /** @var HelloService $helloService */
-        $helloService = $this->get('helloService');
-        return $helloService->get($request, $response, $args);
+class DefaultService
+{
+    public function notImplemented(Request $request, Response $response, $args) {
+        $response->getBody()->write('501 Not Implemented');
+        return $response
+            ->withStatus(501, 'Not Implemented')
+            ->withHeader("Content-Type", "text/plain");
     }
-
-    return $defaultService->notImplemented($request, $response, $args);
-};
+}

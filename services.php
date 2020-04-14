@@ -18,10 +18,20 @@
  *
  */
 
+declare(strict_types=1);
+
 use DI\Container;
+use Systemboard\Services\DefaultService;
 use Systemboard\Services\HelloService;
 
+require 'config.php';
+
 $services = new Container();
-$services->set('helloService', fn() => new HelloService());
+
+// Base services
+$services->set('database', fn() => new PDO(DB_DSN, DB_USER, DB_PASS));
+$services->set('defaultService', fn() => new DefaultService());
+
+$services->set('helloService', fn() => new HelloService($services->get('database')));
 
 return $services;
