@@ -76,7 +76,11 @@ class WallService
 
     private function getCurrentId(): int
     {
-        // todo implement
-        return 4;
+        $stmt = $this->pdo->prepare('SELECT MAX(id) FROM wall');
+        if (!$stmt->execute() || $stmt->rowCount() == 0)
+            return 0;
+
+        $row = $stmt->fetch(PDO::FETCH_NUM);
+        return $row[0];
     }
 }

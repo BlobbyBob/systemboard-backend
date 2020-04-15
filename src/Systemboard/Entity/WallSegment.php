@@ -29,10 +29,10 @@ use PDO;
 class WallSegment extends AbstractEntity
 {
     public int $id;
-    public Wall $wall;
+    public ?Wall $wall;
     public string $filename;
 
-    private function __construct(int $id, Wall $wall = null, string $filename = null)
+    private function __construct(int $id, ?Wall $wall = null, ?string $filename = null)
     {
         $this->id = $id;
         $this->wall = $wall;
@@ -41,7 +41,7 @@ class WallSegment extends AbstractEntity
         $this->resolved = !is_null($wall) && !is_null($filename);
     }
 
-    public static function load(PDO $pdo, int $id): WallSegment
+    public static function load(PDO $pdo, int $id): ?WallSegment
     {
         $stmt = $pdo->prepare('SELECT id, wall, filename FROM wall_segment WHERE id = ?');
         if ($stmt->execute([$id]) && $stmt->rowCount() > 0) {

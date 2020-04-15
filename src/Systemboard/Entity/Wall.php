@@ -31,7 +31,7 @@ class Wall extends AbstractEntity
     public int $id;
     public string $name;
 
-    private function __construct(int $id, string $name = null)
+    private function __construct(int $id, ?string $name = null)
     {
         $this->id = $id;
         $this->name = $name ?? '';
@@ -39,7 +39,7 @@ class Wall extends AbstractEntity
         $this->resolved = !is_null($name);
     }
 
-    public static function load(PDO $pdo, int $id): Wall
+    public static function load(PDO $pdo, int $id): ?Wall
     {
         $stmt = $pdo->prepare('SELECT id, name FROM wall WHERE id = ?');
         if ($stmt->execute([$id]) && $stmt->rowCount() > 0) {
@@ -54,7 +54,8 @@ class Wall extends AbstractEntity
         return new Wall($id);
     }
 
-    public function resolve(PDO $pdo): bool {
+    public function resolve(PDO $pdo): bool
+    {
         if (!$this->resolved) {
             $stmt = $pdo->prepare('SELECT id, name FROM wall WHERE id = ?');
             if ($stmt->execute([$this->id]) && $stmt->rowCount() > 0) {
