@@ -43,7 +43,7 @@ class WallService
 
     public function get(Request $request, Response $response, $args)
     {
-        $id = (int)($args['id'] ?? 0);
+        $id = (int) ($args['id'] ?? 0);
 
         if ($id <= 0)
             $id = $this->getCurrentId();

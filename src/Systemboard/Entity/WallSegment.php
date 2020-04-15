@@ -45,7 +45,7 @@ class WallSegment extends AbstractEntity
     {
         $stmt = $pdo->prepare('SELECT id, wall, filename FROM wall_segment WHERE id = ?');
         if ($stmt->execute([$id]) && $stmt->rowCount() > 0) {
-            list($id, $wallId, $filename) = $stmt->fetch(PDO::FETCH_NUM);
+            [$id, $wallId, $filename] = $stmt->fetch(PDO::FETCH_NUM);
             return new WallSegment($id, Wall::unresolved($wallId), $filename);
         }
         return null;
@@ -54,6 +54,7 @@ class WallSegment extends AbstractEntity
     /**
      * @param PDO  $pdo
      * @param Wall $wall
+     *
      * @return WallSegment[]
      */
     public static function loadByWall(PDO $pdo, Wall $wall): array
@@ -63,7 +64,7 @@ class WallSegment extends AbstractEntity
         if ($stmt->execute([$wall->id])) {
 
             while (($row = $stmt->fetch(PDO::FETCH_NUM)) !== false) {
-                list($id, $wallId, $filename) = $row;
+                [$id, $wallId, $filename] = $row;
                 $segments[] = new WallSegment($id, Wall::unresolved($wallId), $filename);
             }
 
@@ -76,11 +77,12 @@ class WallSegment extends AbstractEntity
         return new WallSegment($id);
     }
 
-    public function resolve(PDO $pdo): bool {
+    public function resolve(PDO $pdo): bool
+    {
         if (!$this->resolved) {
             $stmt = $pdo->prepare('SELECT id, wall, filename FROM wall_segment WHERE id = ?');
             if ($stmt->execute([$this->id]) && $stmt->rowCount() > 0) {
-                list($this->id, $wallId, $this->filename) = $stmt->fetch(PDO::FETCH_NUM);
+                [$this->id, $wallId, $this->filename] = $stmt->fetch(PDO::FETCH_NUM);
                 $this->wall = Wall::unresolved($wallId);
                 $this->resolved = true;
             }

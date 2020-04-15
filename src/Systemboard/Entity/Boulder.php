@@ -26,43 +26,61 @@ namespace Systemboard\Entity;
 
 use PDO;
 
-class Wall extends AbstractEntity
+class Boulder extends AbstractEntity
 {
     public int $id;
     public string $name;
+    public ?User $user;
+    public ?string $description;
+    public $date;
 
-    private function __construct(int $id, ?string $name = null)
+
+    /**
+     * Boulder constructor.
+     *
+     * @param int         $id
+     * @param string|null $name
+     * @param User|null   $user
+     * @param string|null $description
+     * @param null        $date
+     */
+    private function __construct(int $id, string $name = null, ?User $user = null, ?string $description = null, $date = null)
     {
         $this->id = $id;
         $this->name = $name ?? '';
+        $this->user = $user;
+        $this->description = $description;
+        $this->date = $date;
 
         $this->resolved = !is_null($name);
     }
 
-    public static function load(PDO $pdo, int $id): ?Wall
+    public static function load(PDO $pdo, int $id): ?Boulder
     {
-        $stmt = $pdo->prepare('SELECT id, name FROM wall WHERE id = ?');
+        $stmt = $pdo->prepare('SELECT id, name, user, description, date FROM boulder_meta WHERE id = ?');
         if ($stmt->execute([$id]) && $stmt->rowCount() > 0) {
-            [$id, $name] = $stmt->fetch(PDO::FETCH_NUM);
-            return new Wall($id, $name);
+            [$id, $name, $user, $description, $date] = $stmt->fetch(PDO::FETCH_NUM);
+            return new Boulder($id, $name, User::unresolved($user), $description, $date);
         }
         return null;
     }
 
-    public static function unresolved(int $id): Wall
+    public static function unresolved(int $id): Boulder
     {
-        return new Wall($id);
+        return new Boulder($id);
     }
 
     public function resolve(PDO $pdo): bool
     {
         if (!$this->resolved) {
-            $stmt = $pdo->prepare('SELECT id, name FROM wall WHERE id = ?');
+            $stmt = $pdo->prepare('SELECT id, name, user, description, date FROM boulder_meta WHERE id = ?');
             if ($stmt->execute([$this->id]) && $stmt->rowCount() > 0) {
-                [$this->id, $this->name] = $stmt->fetch(PDO::FETCH_NUM);
+                [$this->id, $this->name, $user, $this->description, $this->date] = $stmt->fetch(PDO::FETCH_NUM);
+                $this->user = User::unresolved($user);
                 $this->resolved = true;
             }
         }
         return $this->resolved;
     }
+
 }
