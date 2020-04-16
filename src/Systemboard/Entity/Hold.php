@@ -80,4 +80,21 @@ class Hold extends AbstractEntity
         return $this->resolved;
     }
 
+    /**
+     * @param PDO $pdo
+     *
+     * @return Boulder[]
+     */
+    public function fetchBoulders(PDO $pdo): array
+    {
+        $holds = [];
+        $stmt = $pdo->prepare('SELECT boulderid FROM boulder WHERE holdid = ?');
+        if ($stmt->execute([$this->id])) {
+            while (($row = $stmt->fetch(PDO::FETCH_NUM)) !== false) {
+                $holds[] = Boulder::unresolved($row[0]);
+            }
+        }
+        return $holds;
+    }
+
 }

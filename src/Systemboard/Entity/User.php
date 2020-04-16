@@ -95,4 +95,40 @@ class User extends AbstractEntity
         return $this->resolved;
     }
 
+    /**
+     * @param PDO $pdo
+     *
+     * @return Boulder[]
+     */
+    public function fetchClimbedBoulders(PDO $pdo): array
+    {
+        $boulders = [];
+        $stmt = $pdo->prepare('SELECT boulder FROM climbed WHERE user = ?');
+        if ($stmt->execute([$this->id])) {
+            while (([$userid] = $stmt->fetch(PDO::FETCH_NUM)) !== false) {
+                $boulders[] = Boulder::unresolved($userid);
+            }
+        }
+        return $boulders;
+    }
+
+    /**
+     * @param PDO  $pdo
+     * @param Wall $wall
+     *
+     * @return Boulder[]
+     */
+    public function fetchClimbedBouldersByWall(PDO $pdo, Wall $wall): array
+    {
+        $boulders = [];
+        $stmt = $pdo->prepare('SELECT boulder FROM climbed WHERE user = ? AND EXISTS(SELECT * FROM wall w LEFT JOIN wall_segment ws '
+            . 'on w.id = ws.wall LEFT JOIN hold h on ws.id = h.wall_segment LEFT JOIN boulder b on h.id = b.holdid WHERE b.boulderid = boulder AND w.id = ?)');
+        if ($stmt->execute([$this->id, $wall->id])) {
+            while (([$userid] = $stmt->fetch(PDO::FETCH_NUM)) !== false) {
+                $boulders[] = Boulder::unresolved($userid);
+            }
+        }
+        return $boulders;
+    }
+
 }

@@ -34,7 +34,6 @@ class Boulder extends AbstractEntity
     public ?string $description;
     public $date;
 
-
     /**
      * Boulder constructor.
      *
@@ -81,6 +80,80 @@ class Boulder extends AbstractEntity
             }
         }
         return $this->resolved;
+    }
+
+    /**
+     * @param PDO $pdo
+     *
+     * @return Hold[]
+     */
+    public function fetchHolds(PDO $pdo): array
+    {
+        $holds = [];
+        $stmt = $pdo->prepare('SELECT holdid FROM boulder WHERE boulderid = ?');
+        if ($stmt->execute([$this->id])) {
+            while (([$userid] = $stmt->fetch(PDO::FETCH_NUM)) !== false) {
+                $holds[] = Hold::unresolved($userid);
+            }
+        }
+        return $holds;
+    }
+
+    /**
+     * @param PDO $pdo
+     *
+     * @return User[]
+     */
+    public function fetchClimbers(PDO $pdo): array
+    {
+        $climbers = [];
+        $stmt = $pdo->prepare('SELECT user FROM climbed WHERE boulder = ?');
+        if ($stmt->execute([$this->id])) {
+            while (([$userid] = $stmt->fetch(PDO::FETCH_NUM)) !== false) {
+                $climbers[] = User::unresolved($userid);
+            }
+        }
+        return $climbers;
+    }
+
+    public function isBoulderOfTheDay(PDO $pdo): bool
+    {
+        $stmt = $pdo->prepare('SELECT COUNT(*) FROM boulder_of_the_day WHERE boulderid = ? AND date = CURRENT_DATE');
+        if ($stmt->execute([$this->id])) {
+            [$count] = $stmt->fetch(PDO::FETCH_NUM);
+            if ($count > 0) return true;
+        }
+        return false;
+    }
+
+    public function fetchAscents(PDO $pdo): int
+    {
+        $stmt = $pdo->prepare('SELECT count FROM climbed_view WHERE boulder = ?');
+        if ($stmt->execute([$this->id]) && $stmt->rowCount() > 0) {
+            [$count] = $stmt->fetch(PDO::FETCH_NUM);
+            return $count;
+        }
+        return 0;
+    }
+
+    public function getRating(PDO $pdo): ?float
+    {
+        $stmt = $pdo->prepare('SELECT stars FROM rating_view WHERE boulder = ?');
+        if ($stmt->execute([$this->id]) && $stmt->rowCount() > 0) {
+            [$stars] = $stmt->fetch(PDO::FETCH_NUM);
+            return $stars;
+        }
+        return null;
+    }
+
+    public function getGrade(PDO $pdo): ?float
+    {
+        $stmt = $pdo->prepare('SELECT grade FROM grade_view WHERE boulder = ?');
+        if ($stmt->execute([$this->id]) && $stmt->rowCount() > 0) {
+            [$grade] = $stmt->fetch(PDO::FETCH_NUM);
+            return $grade;
+        }
+        return null;
     }
 
 }
