@@ -28,7 +28,24 @@ use Slim\Psr7\Response;
 
 class DefaultService
 {
-    public function notImplemented(Request $request, Response $response, $args) {
+
+    public static function badRequest(Request $request, Response $response)
+    {
+        $response->getBody()->write('Bad Request');
+        return $response
+            ->withStatus(400, 'Bad Request')
+            ->withHeader('Content-Type', 'text/plain; charset=utf8');
+    }
+
+    public static function notFound(Request $request, Response $response)
+    {
+        $response->getBody()->write('Not Found');
+        return $response
+            ->withStatus(404, 'Not Found')
+            ->withHeader('Content-Type', 'text/plain; charset=utf8');
+    }
+
+    public static function notImplemented(Request $request, Response $response, $args) {
         $response->getBody()->write('501 Not Implemented');
         return $response
             ->withStatus(501, 'Not Implemented')

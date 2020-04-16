@@ -37,5 +37,6 @@ $app->addErrorMiddleware(true, true, true);
 
 $app->get('/wall', $getWallHandler);
 $app->get('/wall/{id}', $getWallHandler);
+$app->get('/holds/{wall}', $getHoldsHandler);
 
 $app->run();

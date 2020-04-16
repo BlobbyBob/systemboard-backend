@@ -29,10 +29,10 @@ use Slim\Psr7\Request;
 use Slim\Psr7\Response;
 use Systemboard\Entity\Wall;
 use Systemboard\Entity\WallSegment;
-use Systemboard\PublicEntity\Wall as PublicWall;
-use Systemboard\PublicEntity\WallSegment as PublicWallSegment;
+use Systemboard\PublicEntity\Hold as PublicHold;
+use Systemboard\PublicEntity\Holds as PublicHolds;
 
-class WallService
+class HoldService
 {
     private PDO $pdo;
 
@@ -43,26 +43,32 @@ class WallService
 
     public function get(Request $request, Response $response, $args)
     {
-        $id = (int) ($args['id'] ?? 0);
+        $wallid = (int) ($args['wall'] ?? 0);
 
-        if ($id <= 0)
-            $id = $this->getCurrentId();
+        if ($wallid <= 0) {
+            return DefaultService::badRequest($request, $response);
+        }
 
-        $wall = Wall::load($this->pdo, $id);
+        $wall = Wall::load($this->pdo, $wallid);
         if (is_null($wall)) {
             return DefaultService::notFound($request, $response);
         }
 
         $segments = WallSegment::loadByWall($this->pdo, $wall);
 
-        $responseObject = new PublicWall();
-        $responseObject->id = $wall->id;
-        $responseObject->name = $wall->name;
-        $responseObject->wallSegments = [];
+        $responseObject = [];
         foreach ($segments as $segment) {
-            $wallSegment = new PublicWallSegment();
-            $wallSegment->image = $segment->filename;
-            $responseObject->wallSegments[] = $wallSegment;
+            $holds = new PublicHolds();
+            $holds->filename = $segment->filename;
+            $holds->holds = [];
+            foreach ($segment->fetchHolds($this->pdo) as $hold) {
+                $publicHold = new PublicHold();
+                $publicHold->id = $hold->id;
+                $publicHold->tag = $hold->tag;
+                $publicHold->attr = $hold->attr;
+                $holds->holds[] = $publicHold;
+            }
+            $responseObject[] = $holds;
         }
 
         $response->getBody()->write(json_encode($responseObject));

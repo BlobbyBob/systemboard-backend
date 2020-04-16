@@ -23,11 +23,10 @@ declare(strict_types=1);
 use Slim\Psr7\Request;
 use Slim\Psr7\Response;
 use systemboard\services\DefaultService;
+use Systemboard\Services\HoldService;
 use Systemboard\Services\WallService;
 
 $getWallHandler = function (Request $request, Response $response, $args) {
-    /** @var DefaultService $defaultService */
-    $defaultService = $this->get('defaultService');
 
     if ($this->has('wallService')) {
         /** @var WallService $wallService */
@@ -35,5 +34,16 @@ $getWallHandler = function (Request $request, Response $response, $args) {
         return $wallService->get($request, $response, $args);
     }
 
-    return $defaultService->notImplemented($request, $response, $args);
+    return DefaultService::notImplemented($request, $response, $args);
+};
+
+$getHoldsHandler = function (Request $request, Response $response, $args) {
+
+    if ($this->has('holdService')) {
+        /** @var HoldService $holdService */
+        $holdService = $this->get('holdService');
+        return $holdService->get($request, $response, $args);
+    }
+
+    return DefaultService::notImplemented($request, $response, $args);
 };
