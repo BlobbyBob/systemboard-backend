@@ -89,4 +89,14 @@ class WallSegment extends AbstractEntity
         }
         return $this->resolved;
     }
+
+    /**
+     * @param PDO $pdo
+     *
+     * @return Hold[]
+     */
+    public function fetchHolds(PDO $pdo): array
+    {
+        return Hold::loadByWallSegment($pdo, $this);
+    }
 }

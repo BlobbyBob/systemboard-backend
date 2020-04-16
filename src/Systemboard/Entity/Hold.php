@@ -62,6 +62,25 @@ class Hold extends AbstractEntity
         return null;
     }
 
+    /**
+     * @param PDO         $pdo
+     * @param WallSegment $wallSegment
+     *
+     * @return Hold[]
+     */
+    public static function loadByWallSegment(PDO $pdo, WallSegment $wallSegment): array
+    {
+        $holds = [];
+        $stmt = $pdo->prepare('SELECT id, tag, attr FROM hold WHERE wall_segment = ?');
+        if ($stmt->execute([$wallSegment->id]) && $stmt->rowCount() > 0) {
+            while (($row = $stmt->fetch(PDO::FETCH_NUM)) !== false) {
+                [$id, $tag, $attr] = $row;
+                $holds[] = new Hold($id, $wallSegment, $tag, $attr);
+            }
+        }
+        return $holds;
+    }
+
     public static function unresolved(int $id): Hold
     {
         return new Hold($id);
