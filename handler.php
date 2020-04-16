@@ -22,7 +22,8 @@ declare(strict_types=1);
 
 use Slim\Psr7\Request;
 use Slim\Psr7\Response;
-use systemboard\services\DefaultService;
+use Systemboard\Services\BoulderService;
+use systemboard\Services\DefaultService;
 use Systemboard\Services\HoldService;
 use Systemboard\Services\WallService;
 
@@ -43,6 +44,17 @@ $getHoldsHandler = function (Request $request, Response $response, $args) {
         /** @var HoldService $holdService */
         $holdService = $this->get('holdService');
         return $holdService->get($request, $response, $args);
+    }
+
+    return DefaultService::notImplemented($request, $response, $args);
+};
+
+$getBoulderByIdHandler = function (Request $request, Response $response, $args) {
+
+    if ($this->has('boulderService')) {
+        /** @var BoulderService $boulderService */
+        $boulderService = $this->get('boulderService');
+        return $boulderService->getById($request, $response, $args);
     }
 
     return DefaultService::notImplemented($request, $response, $args);

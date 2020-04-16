@@ -20,25 +20,13 @@
 
 declare(strict_types=1);
 
-use DI\Container;
-use Systemboard\Services\BoulderService;
-use Systemboard\Services\HoldService;
-use Systemboard\Services\WallService;
 
-require 'config.php';
+namespace Systemboard\PublicEntity;
 
-$services = new Container();
 
-// Base services
-$services->set('database', function () {
-    $pdo = new PDO(DB_DSN, DB_USER, DB_PASS);
-    $pdo->setAttribute(PDO::ATTR_STRINGIFY_FETCHES, false);
-    $pdo->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
-    return $pdo;
-});
-
-$services->set('wallService', fn() => new WallService($services->get('database')));
-$services->set('holdService', fn() => new HoldService($services->get('database')));
-$services->set('boulderService', fn() => new BoulderService($services->get('database')));
-
-return $services;
+class Location
+{
+    public int $min;
+    public int $main;
+    public int $max;
+}

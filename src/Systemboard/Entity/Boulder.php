@@ -85,15 +85,15 @@ class Boulder extends AbstractEntity
     /**
      * @param PDO $pdo
      *
-     * @return Hold[]
+     * @return array Each element consisting of [Hold, int], where the second parameter indicates the type of the hold
      */
     public function fetchHolds(PDO $pdo): array
     {
         $holds = [];
-        $stmt = $pdo->prepare('SELECT holdid FROM boulder WHERE boulderid = ?');
+        $stmt = $pdo->prepare('SELECT holdid, type FROM boulder WHERE boulderid = ?');
         if ($stmt->execute([$this->id])) {
-            while (([$userid] = $stmt->fetch(PDO::FETCH_NUM)) !== false) {
-                $holds[] = Hold::unresolved($userid);
+            while (([$userid, $type] = $stmt->fetch(PDO::FETCH_NUM)) !== false) {
+                $holds[] = [Hold::unresolved($userid), $type];
             }
         }
         return $holds;
@@ -141,7 +141,7 @@ class Boulder extends AbstractEntity
         $stmt = $pdo->prepare('SELECT stars FROM rating_view WHERE boulder = ?');
         if ($stmt->execute([$this->id]) && $stmt->rowCount() > 0) {
             [$stars] = $stmt->fetch(PDO::FETCH_NUM);
-            return $stars;
+            return (float) $stars;
         }
         return null;
     }
@@ -151,7 +151,7 @@ class Boulder extends AbstractEntity
         $stmt = $pdo->prepare('SELECT grade FROM grade_view WHERE boulder = ?');
         if ($stmt->execute([$this->id]) && $stmt->rowCount() > 0) {
             [$grade] = $stmt->fetch(PDO::FETCH_NUM);
-            return $grade;
+            return (float) $grade;
         }
         return null;
     }

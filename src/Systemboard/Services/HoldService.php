@@ -76,14 +76,4 @@ class HoldService
             ->withStatus(200, 'OK')
             ->withHeader('Content-Type', 'application/json; charset=utf8');
     }
-
-    private function getCurrentId(): int
-    {
-        $stmt = $this->pdo->prepare('SELECT MAX(id) FROM wall');
-        if (!$stmt->execute() || $stmt->rowCount() == 0)
-            return 0;
-
-        $row = $stmt->fetch(PDO::FETCH_NUM);
-        return $row[0];
-    }
 }
