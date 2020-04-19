@@ -32,15 +32,8 @@ use Systemboard\Entity\WallSegment;
 use Systemboard\PublicEntity\Wall as PublicWall;
 use Systemboard\PublicEntity\WallSegment as PublicWallSegment;
 
-class WallService
+class WallService extends AbstractService
 {
-    private PDO $pdo;
-
-    public function __construct(PDO $pdo)
-    {
-        $this->pdo = $pdo;
-    }
-
     public function get(Request $request, Response $response, $args)
     {
         $id = (int) ($args['id'] ?? 0);

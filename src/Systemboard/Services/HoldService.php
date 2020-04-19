@@ -24,7 +24,6 @@ declare(strict_types=1);
 namespace Systemboard\Services;
 
 
-use PDO;
 use Slim\Psr7\Request;
 use Slim\Psr7\Response;
 use Systemboard\Entity\Wall;
@@ -32,15 +31,8 @@ use Systemboard\Entity\WallSegment;
 use Systemboard\PublicEntity\Hold as PublicHold;
 use Systemboard\PublicEntity\Holds as PublicHolds;
 
-class HoldService
+class HoldService extends AbstractService
 {
-    private PDO $pdo;
-
-    public function __construct(PDO $pdo)
-    {
-        $this->pdo = $pdo;
-    }
-
     public function get(Request $request, Response $response, $args)
     {
         $wallid = (int) ($args['wall'] ?? 0);

@@ -5,3 +5,4 @@ define('DB_USER', 'root');
 define('DB_PASS', '');
 
 define('SEGMENTS_PER_WALL', 3);
+define('ARGON_SETTINGS', ['memorycost' => 1 << 13]);
