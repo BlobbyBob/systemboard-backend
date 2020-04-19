@@ -24,7 +24,11 @@ declare(strict_types=1);
 namespace Systemboard\PublicEntity;
 
 
-class Token
+class UserProfileStats
 {
-    public string $token;
+    public int $points;
+    /**
+     * @var string[] | int $ascents
+     */
+    public $ascents;
 }

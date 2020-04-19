@@ -21,10 +21,26 @@
 declare(strict_types=1);
 
 
-namespace Systemboard\PublicEntity;
+namespace Systemboard\Services;
 
 
-class Token
+use Slim\Psr7\Request;
+use Slim\Psr7\Response;
+
+class UserService extends AbstractService
 {
-    public string $token;
+    public function getPrivate(Request $request, Response $response, $args)
+    {
+
+    }
+
+    public function getPublic(Request $request, Response $response, $args)
+    {
+
+    }
+
+    public function put(Request $request, Response $response, $args)
+    {
+
+    }
 }

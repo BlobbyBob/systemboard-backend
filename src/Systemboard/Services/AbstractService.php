@@ -21,10 +21,17 @@
 declare(strict_types=1);
 
 
-namespace Systemboard\PublicEntity;
+namespace Systemboard\Services;
 
 
-class Token
+use PDO;
+
+class AbstractService
 {
-    public string $token;
+    protected PDO $pdo;
+
+    public function __construct(PDO $pdo)
+    {
+        $this->pdo = $pdo;
+    }
 }

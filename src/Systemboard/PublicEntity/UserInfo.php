@@ -24,7 +24,10 @@ declare(strict_types=1);
 namespace Systemboard\PublicEntity;
 
 
-class Token
+class UserInfo
 {
-    public string $token;
+    public int $id;
+    public string $name;
+    public string $email;
+    public bool $newsletter;
 }

@@ -24,21 +24,13 @@ declare(strict_types=1);
 namespace Systemboard\Services;
 
 
-use PDO;
 use Slim\Psr7\Request;
 use Slim\Psr7\Response;
 use Systemboard\Entity\User;
 use Systemboard\PublicEntity\Token as TokenPublic;
 
-class LoginService
+class LoginService extends AbstractService
 {
-    private PDO $pdo;
-
-    public function __construct(PDO $pdo)
-    {
-        $this->pdo = $pdo;
-    }
-
     public function login(Request $request, Response $response, $args)
     {
         $email = (string) ($args['email'] ?? '');

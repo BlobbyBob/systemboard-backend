@@ -24,7 +24,6 @@ declare(strict_types=1);
 namespace Systemboard\Services;
 
 
-use PDO;
 use Slim\Psr7\Request;
 use Slim\Psr7\Response;
 use Systemboard\Entity\Boulder;
@@ -33,15 +32,8 @@ use Systemboard\PublicEntity\Boulder as PublicBoulder;
 use Systemboard\PublicEntity\Creator as PublicCreator;
 use Systemboard\PublicEntity\Location as PublicLocation;
 
-class BoulderService
+class BoulderService extends AbstractService
 {
-    private PDO $pdo;
-
-    public function __construct(PDO $pdo)
-    {
-        $this->pdo = $pdo;
-    }
-
     public function getById(Request $request, Response $response, $args)
     {
         $id = (int) ($args['id'] ?? 0);

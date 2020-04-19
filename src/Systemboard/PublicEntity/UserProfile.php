@@ -24,7 +24,10 @@ declare(strict_types=1);
 namespace Systemboard\PublicEntity;
 
 
-class Token
+class UserProfile
 {
-    public string $token;
+    public int $id;
+    public int $name;
+    public UserProfileStats $semester;
+    public UserProfileStats $total;
 }
