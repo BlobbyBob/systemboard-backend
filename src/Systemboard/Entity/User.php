@@ -78,6 +78,16 @@ class User extends AbstractEntity
         return null;
     }
 
+    public static function loadByEmail(PDO $pdo, string $email): ?User
+    {
+        $stmt = $pdo->prepare('SELECT id, email, password, name, status, activation, newsletter, forgotpw, badge FROM user WHERE email = ?');
+        if ($stmt->execute([$email]) && $stmt->rowCount() > 0) {
+            [$id, $email, $password, $name, $status, $activation, $newsletter, $forgotpw, $badge] = $stmt->fetch(PDO::FETCH_NUM);
+            return new User($id, $email, $password, $name, $status, $activation, $newsletter, $forgotpw, $badge);
+        }
+        return null;
+    }
+
     public static function unresolved(int $id)
     {
         return new User($id);

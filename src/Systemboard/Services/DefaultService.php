@@ -45,7 +45,7 @@ class DefaultService
             ->withHeader('Content-Type', 'text/plain; charset=utf8');
     }
 
-    public static function notImplemented(Request $request, Response $response, $args) {
+    public static function notImplemented(Request $request, Response $response) {
         $response->getBody()->write('501 Not Implemented');
         return $response
             ->withStatus(501, 'Not Implemented')

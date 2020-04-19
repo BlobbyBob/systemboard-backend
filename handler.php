@@ -35,7 +35,7 @@ $getWallHandler = function (Request $request, Response $response, $args) {
         return $wallService->get($request, $response, $args);
     }
 
-    return DefaultService::notImplemented($request, $response, $args);
+    return DefaultService::notImplemented($request, $response);
 };
 
 $getHoldsHandler = function (Request $request, Response $response, $args) {
@@ -46,7 +46,7 @@ $getHoldsHandler = function (Request $request, Response $response, $args) {
         return $holdService->get($request, $response, $args);
     }
 
-    return DefaultService::notImplemented($request, $response, $args);
+    return DefaultService::notImplemented($request, $response);
 };
 
 $getBoulderByIdHandler = function (Request $request, Response $response, $args) {
@@ -57,5 +57,5 @@ $getBoulderByIdHandler = function (Request $request, Response $response, $args) 
         return $boulderService->getById($request, $response, $args);
     }
 
-    return DefaultService::notImplemented($request, $response, $args);
+    return DefaultService::notImplemented($request, $response);
 };
