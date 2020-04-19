@@ -1,0 +1,118 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "type": "object",
+  "default": {},
+  "additionalProperties": true,
+  "required": [
+    "name",
+    "grade",
+    "stars",
+    "holds"
+  ],
+  "properties": {
+    "name": {
+      "$id": "#/properties/name",
+      "type": "string",
+      "title": "name",
+      "description": "Name of the boulder",
+      "default": "",
+      "examples": [
+        "abc"
+      ],
+      "maxLength": 50,
+      "minLength": 3
+    },
+    "grade": {
+      "$id": "#/properties/grade",
+      "type": "integer",
+      "title": "grade",
+      "description": "Suggested grade for the boulder",
+      "default": 0,
+      "examples": [
+        13.0
+      ],
+      "maximum": 24.0,
+      "minimum": 8.0
+    },
+    "stars": {
+      "$id": "#/properties/stars",
+      "type": "integer",
+      "title": "rating",
+      "description": "Suggested rating for the boulder",
+      "default": 0,
+      "examples": [
+        1.0
+      ],
+      "maximum": 5.0,
+      "minimum": 1.0
+    },
+    "holds": {
+      "$id": "#/properties/holds",
+      "type": "object",
+      "title": "holds",
+      "description": "List of holds associated with the boulder",
+      "default": [],
+      "examples": [
+        [
+          {
+            "id": 123.0,
+            "type": 1.0
+          }
+        ]
+      ],
+      "additionalItems": true,
+      "minItems": 1,
+      "items": {
+        "$id": "#/properties/holds/items",
+        "type": "object",
+        "title": "hold",
+        "description": "An explanation about the purpose of this instance.",
+        "default": [],
+        "examples": [
+          {
+            "id": 123,
+            "type": 1
+          }
+        ],
+        "additionalProperties": true,
+        "required": [
+          "id",
+          "type"
+        ],
+        "properties": {
+          "id": {
+            "$id": "#/properties/holds/items/properties/id",
+            "type": "integer",
+            "title": "id",
+            "description": "ID of the Hold",
+            "default": 0,
+            "examples": [
+              123
+            ]
+          },
+          "type": {
+            "$id": "#/properties/holds/items/properties/type",
+            "type": "integer",
+            "title": "type",
+            "description": "type of the hold, either 1 (normal) or 2 (special)",
+            "enum": [1, 2],
+            "examples": [
+              1
+            ]
+          }
+        }
+      }
+    },
+      "description": {
+        "$id": "#/properties/description",
+        "type": "string",
+        "title": "description",
+        "description": "Optional notes or description of the boulder",
+        "default": "",
+        "examples": [
+          "Long description"
+        ],
+        "maxLength": 1000
+      }
+    }
+  }

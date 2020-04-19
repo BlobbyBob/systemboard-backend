@@ -69,6 +69,26 @@ class Boulder extends AbstractEntity
         return new Boulder($id);
     }
 
+    public static function create(PDO $pdo, string $name, User $user, string $description, array $holds): ?Boulder
+    {
+        $pdo->beginTransaction();
+        $stmt = $pdo->prepare('INSERT INTO boulder_meta (name, user, description) VALUES (?, ?, ?)');
+        if ($stmt->execute([$name, $user->id, $description])) {
+            $id = (int) $pdo->lastInsertId();
+            $stmt = $pdo->prepare('INSERT INTO boulder (boulderid, holdid, type) VALUES (?, ?, ?)');
+            foreach ($holds as [$holdid, $type]) {
+                if (!$stmt->execute([$id, $holdid, $type])) {
+                    $pdo->rollBack();
+                    return null;
+                }
+            }
+            $pdo->commit();
+            return Boulder::load($pdo, $id);
+        }
+        $pdo->rollBack();
+        return null;
+    }
+
     public function resolve(PDO $pdo): bool
     {
         if (!$this->resolved) {

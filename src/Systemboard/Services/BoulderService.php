@@ -24,11 +24,14 @@ declare(strict_types=1);
 namespace Systemboard\Services;
 
 
+use Opis\JsonSchema\Schema;
+use Opis\JsonSchema\Validator;
 use PDO;
 use Slim\Psr7\Request;
 use Slim\Psr7\Response;
 use Systemboard\Entity\Boulder;
 use Systemboard\Entity\Hold;
+use Systemboard\Entity\User;
 use Systemboard\PublicEntity\Boulder as PublicBoulder;
 use Systemboard\PublicEntity\Creator as PublicCreator;
 use Systemboard\PublicEntity\Location as PublicLocation;
@@ -89,6 +92,32 @@ class BoulderService
         $responseObject->location->main = $this->computeMainWall($main);
 
         $response->getBody()->write(json_encode($responseObject));
+        return $response
+            ->withStatus(200, 'OK')
+            ->withHeader('Content-Type', 'application/json; charset=utf8');
+    }
+
+    public function post(Request $request, Response $response, $args)
+    {
+        $data = $request->getParsedBody();
+        $schema = Schema::fromJsonString(file_get_contents('./schema/boulderAdd.schema.json'));
+        $validator = new Validator();
+        $result = $validator->schemaValidation($data, $schema);
+
+        if (!$result->isValid()) {
+            return DefaultService::badRequest($request, $response);
+        }
+
+        $holds = [];
+        foreach ($data->holds as $hold) {
+            $holds[] = [$hold->id, $hold->type];
+        }
+        $boulder = Boulder::create($this->pdo, $data->name, User::unresolved(1), $data->description, $holds); // todo adjust, when authentication is implemented
+        if (is_null($boulder)) {
+            return DefaultService::badRequest($request, $response);
+        }
+
+        $response->getBody()->write(json_encode($boulder));
         return $response
             ->withStatus(200, 'OK')
             ->withHeader('Content-Type', 'application/json; charset=utf8');
