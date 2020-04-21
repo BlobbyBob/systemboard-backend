@@ -31,7 +31,6 @@ use Systemboard\Entity\User;
 use Systemboard\PublicEntity\BoulderStub as PublicBoulderStub;
 use Systemboard\PublicEntity\UserInfo as PublicUserInfo;
 use Systemboard\PublicEntity\UserProfile as PublicUserProfile;
-use Systemboard\PublicEntity\UserProfileStats as PublicUserProfileStats;
 use Systemboard\PublicEntity\UserStats as PublicUserStats;
 
 class UserService extends AbstractService

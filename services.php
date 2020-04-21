@@ -23,6 +23,8 @@ declare(strict_types=1);
 use DI\Container;
 use Systemboard\Services\BoulderService;
 use Systemboard\Services\HoldService;
+use Systemboard\Services\LoginService;
+use Systemboard\Services\UserService;
 use Systemboard\Services\WallService;
 
 require 'config.php';
@@ -37,8 +39,10 @@ $services->set('database', function () {
     return $pdo;
 });
 
-$services->set('wallService', fn() => new WallService($services->get('database')));
-$services->set('holdService', fn() => new HoldService($services->get('database')));
 $services->set('boulderService', fn() => new BoulderService($services->get('database')));
+$services->set('holdService', fn() => new HoldService($services->get('database')));
+$services->set('loginService', fn() => new LoginService($services->get('database')));
+$services->set('userService', fn() => new UserService($services->get('database')));
+$services->set('wallService', fn() => new WallService($services->get('database')));
 
 return $services;

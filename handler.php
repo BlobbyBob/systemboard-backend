@@ -25,6 +25,8 @@ use Slim\Psr7\Response;
 use Systemboard\Services\BoulderService;
 use systemboard\Services\DefaultService;
 use Systemboard\Services\HoldService;
+use Systemboard\Services\LoginService;
+use Systemboard\Services\UserService;
 use Systemboard\Services\WallService;
 
 $getWallHandler = function (Request $request, Response $response, $args) {
@@ -55,6 +57,50 @@ $getBoulderByIdHandler = function (Request $request, Response $response, $args) 
         /** @var BoulderService $boulderService */
         $boulderService = $this->get('boulderService');
         return $boulderService->getById($request, $response, $args);
+    }
+
+    return DefaultService::notImplemented($request, $response);
+};
+
+$getLoginHandler = function (Request $request, Response $response, $args) {
+
+    if ($this->has('loginService')) {
+        /** @var LoginService $loginService */
+        $loginService = $this->get('loginService');
+        return $loginService->login($request, $response, $args);
+    }
+
+    return DefaultService::notImplemented($request, $response);
+};
+
+$postBoulderHandler = function (Request $request, Response $response, $args) {
+
+    if ($this->has('boulderService')) {
+        /** @var BoulderService $boulderService */
+        $boulderService = $this->get('boulderService');
+        return $boulderService->post($request, $response, $args);
+    }
+
+    return DefaultService::notImplemented($request, $response);
+};
+
+$getUserPrivateHandler = function (Request $request, Response $response, $args) {
+
+    if ($this->has('userService')) {
+        /** @var UserService $userService */
+        $userService = $this->get('userService');
+        return $userService->getPrivate($request, $response, $args);
+    }
+
+    return DefaultService::notImplemented($request, $response);
+};
+
+$getUserPublicHandler = function (Request $request, Response $response, $args) {
+
+    if ($this->has('userService')) {
+        /** @var UserService $userService */
+        $userService = $this->get('userService');
+        return $userService->getPublic($request, $response, $args);
     }
 
     return DefaultService::notImplemented($request, $response);

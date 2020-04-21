@@ -39,5 +39,10 @@ $app->get('/wall', $getWallHandler);
 $app->get('/wall/{id}', $getWallHandler);
 $app->get('/holds/{wall}', $getHoldsHandler);
 $app->get('/boulder/{id}', $getBoulderByIdHandler);
+$app->get('/login/{email}/{authtype}', $getLoginHandler);
+$app->get('/user/{id}', $getUserPrivateHandler);
+$app->get('/profile/{id}', $getUserPublicHandler);
+
+$app->post('/boulder/{id}', $postBoulderHandler);
 
 $app->run();
