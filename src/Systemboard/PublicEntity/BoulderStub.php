@@ -24,10 +24,9 @@ declare(strict_types=1);
 namespace Systemboard\PublicEntity;
 
 
-class UserProfile
+class BoulderStub
 {
     public int $id;
     public string $name;
-    public UserStats $current;
-    public UserStats $total;
+    public int $wall;
 }

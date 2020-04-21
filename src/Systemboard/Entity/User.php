@@ -25,6 +25,7 @@ namespace Systemboard\Entity;
 
 
 use PDO;
+use Systemboard\Data\UserStats;
 
 class User extends AbstractEntity
 {
@@ -139,6 +140,16 @@ class User extends AbstractEntity
             }
         }
         return $boulders;
+    }
+
+    public function save(PDO $pdo): bool
+    {
+        if (!$this->resolved) return false;
+
+        $stmt = $pdo->prepare('UPDATE user SET email = ?, password = ?, name = ?, status = ?, activation = ?, ' .
+            'newsletter = ?, forgotpw = ?, badge = ? WHERE id = ?');
+        return $stmt->execute([$this->email, $this->password, $this->name, $this->status, $this->activation,
+            $this->newsletter, $this->forgotpw, $this->badge, $this->id]);
     }
 
 }

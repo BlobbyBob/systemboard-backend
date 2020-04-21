@@ -24,11 +24,13 @@ declare(strict_types=1);
 namespace Systemboard\PublicEntity;
 
 
-class UserProfileStats
+use PDO;
+use Systemboard\Entity\User;
+
+class UserStats
 {
+    public int $userid;
     public int $points;
-    /**
-     * @var string[] | int $ascents
-     */
-    public $ascents;
+    /** @var BoulderStub[] */
+    public array $ascents;
 }
