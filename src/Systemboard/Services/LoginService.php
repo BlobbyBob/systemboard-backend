@@ -48,7 +48,7 @@ class LoginService extends AbstractService
                 return DefaultService::notFound($request, $response);
             }
 
-            if ($auth[0] != '$') {
+            if ($user->password[0] != '$') {
                 // legacy
                 $hash = hash('sha256', $auth);
                 if (!hash_equals($hash, $user->password)) {
@@ -57,7 +57,7 @@ class LoginService extends AbstractService
                 // rehash
                 if ($hash = password_hash($auth, PASSWORD_ARGON2I, ARGON_SETTINGS)) {
                     $user->password = (string) $hash;
-                    $user->save();
+                    $user->save($this->pdo);
                 }
             } else {
                 if (!password_verify($auth, $user->password)) {
@@ -67,7 +67,7 @@ class LoginService extends AbstractService
                 if (password_needs_rehash($user->password, PASSWORD_ARGON2I, ARGON_SETTINGS)
                     && $hash = password_hash($auth, PASSWORD_ARGON2I, ARGON_SETTINGS)) {
                     $user->password = (string) $hash;
-                    $user->save();
+                    $user->save($this->pdo);
                 }
             }
             $token->token = $this->session($user);

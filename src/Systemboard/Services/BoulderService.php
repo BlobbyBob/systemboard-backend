@@ -91,7 +91,7 @@ class BoulderService extends AbstractService
 
     public function post(Request $request, Response $response, $args)
     {
-        $data = $request->getParsedBody();
+        $data = json_decode($request->getBody()->getContents());
         $schema = Schema::fromJsonString(file_get_contents('./schema/boulderAdd.schema.json'));
         $validator = new Validator();
         $result = $validator->schemaValidation($data, $schema);

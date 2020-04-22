@@ -48,7 +48,7 @@
     },
     "holds": {
       "$id": "#/properties/holds",
-      "type": "object",
+      "type": "array",
       "title": "holds",
       "description": "List of holds associated with the boulder",
       "default": [],

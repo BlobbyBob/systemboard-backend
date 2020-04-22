@@ -43,6 +43,6 @@ $app->get('/login/{email}/{authtype}', $getLoginHandler);
 $app->get('/user/{id}', $getUserPrivateHandler);
 $app->get('/profile/{id}', $getUserPublicHandler);
 
-$app->post('/boulder/{id}', $postBoulderHandler);
+$app->post('/boulder', $postBoulderHandler);
 
 $app->run();
