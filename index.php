@@ -48,5 +48,6 @@ $app->post('/boulder', $postBoulderHandler);
 
 $app->put('/user/{id}', $putUserHandler);
 $app->put('/boulder/{id}/climbed', $putBoulderClimbedHandler);
+$app->put('/boulder/{id}/vote', $putBoulderVoteHandler);
 
 $app->run();

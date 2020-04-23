@@ -153,6 +153,44 @@ class BoulderService extends AbstractService
             ->withHeader('Content-Type', 'application/json; charset=utf8');
     }
 
+    public function putVote(Request $request, Response $response, $args)
+    {
+        $id = (int) ($args['id'] ?? 0);
+
+        $data = json_decode($request->getBody()->getContents());
+        $schema = Schema::fromJsonString(file_get_contents('./schema/votePut.schema.json'));
+        $validator = new Validator();
+        $result = $validator->schemaValidation($data, $schema);
+
+        if (!$result->isValid()) {
+            return DefaultService::badRequest($request, $response);
+        }
+
+        $user = User::load($this->pdo, 1); // todo use authorized user
+        $boulder = Boulder::load($this->pdo, $id);
+        // todo check if boulder is on current wall
+
+        if (is_null($user) || is_null($boulder)) {
+            return DefaultService::badRequest($request, $response);
+        }
+
+        $stmt = $this->pdo->prepare('INSERT IGNORE INTO rating (boulder, user, stars) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE stars = ?');
+        if (!$stmt->execute([$boulder->id, $user->id, $data->rating, $data->rating])) {
+            return DefaultService::internalServerError($request, $response);
+        }
+
+        if (isset($data->grade)) {
+            $stmt = $this->pdo->prepare('INSERT IGNORE INTO grade (boulder, user, grade) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE grade = ?');
+            if (!$stmt->execute([$boulder->id, $user->id, $data->grade, $data->grade])) {
+                return DefaultService::internalServerError($request, $response);
+            }
+        }
+
+        return $response
+            ->withStatus(204, 'No Content')
+            ->withHeader('Content-Type', 'application/json; charset=utf8');
+    }
+
     /**
      * Using the amount of special holds on each segment, compute the most important wall.
      * This method uses knowledge of the specifics of the gym
