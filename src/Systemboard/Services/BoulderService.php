@@ -115,6 +115,44 @@ class BoulderService extends AbstractService
             ->withHeader('Content-Type', 'application/json; charset=utf8');
     }
 
+    public function putClimbed(Request $request, Response $response, $args)
+    {
+        $id = (int) ($args['id'] ?? 0);
+
+        $data = json_decode($request->getBody()->getContents());
+        $schema = Schema::fromJsonString(file_get_contents('./schema/climbedPut.schema.json'));
+        $validator = new Validator();
+        $result = $validator->schemaValidation($data, $schema);
+
+        if (!$result->isValid()) {
+            return DefaultService::badRequest($request, $response);
+        }
+
+        $user = User::load($this->pdo, 1); // todo use authorized user
+        $boulder = Boulder::load($this->pdo, $id);
+        // todo check if boulder is on current wall
+
+        if (is_null($user) || is_null($boulder)) {
+            return DefaultService::badRequest($request, $response);
+        }
+
+        if ($data->climbed) {
+            $stmt = $this->pdo->prepare('INSERT IGNORE INTO climbed (user, boulder) VALUES (?, ?)');
+            if (!$stmt->execute([$user->id, $boulder->id])) {
+                return DefaultService::internalServerError($request, $response);
+            }
+        } else {
+            $stmt = $this->pdo->prepare('DELETE FROM climbed WHERE user = ? AND boulder = ?');
+            if (!$stmt->execute([$user->id, $boulder->id])) {
+                return DefaultService::internalServerError($request, $response);
+            }
+        }
+
+        return $response
+            ->withStatus(204, 'No Content')
+            ->withHeader('Content-Type', 'application/json; charset=utf8');
+    }
+
     /**
      * Using the amount of special holds on each segment, compute the most important wall.
      * This method uses knowledge of the specifics of the gym

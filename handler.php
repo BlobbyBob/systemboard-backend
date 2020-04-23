@@ -84,6 +84,17 @@ $postBoulderHandler = function (Request $request, Response $response, $args) {
     return DefaultService::notImplemented($request, $response);
 };
 
+$putBoulderClimbedHandler = function (Request $request, Response $response, $args) {
+
+    if ($this->has('boulderService')) {
+        /** @var BoulderService $boulderService */
+        $boulderService = $this->get('boulderService');
+        return $boulderService->putClimbed($request, $response, $args);
+    }
+
+    return DefaultService::notImplemented($request, $response);
+};
+
 $getUserPrivateHandler = function (Request $request, Response $response, $args) {
 
     if ($this->has('userService')) {

@@ -39,12 +39,13 @@ $app->get('/wall', $getWallHandler);
 $app->get('/wall/{id}', $getWallHandler);
 $app->get('/holds/{wall}', $getHoldsHandler);
 $app->get('/boulder/{id}', $getBoulderByIdHandler);
-$app->get('/login/{email}/{authtype}', $getLoginHandler);
+$app->get('/login/{authtype}/{email}', $getLoginHandler);
 $app->get('/user/{id}', $getUserPrivateHandler);
 $app->get('/profile/{id}', $getUserPublicHandler);
 
 $app->post('/boulder', $postBoulderHandler);
 
 $app->put('/user/{id}', $putUserHandler);
+$app->put('/boulder/{id}/climbed', $putBoulderClimbedHandler);
 
 $app->run();
