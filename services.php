@@ -24,6 +24,7 @@ use DI\Container;
 use Systemboard\Services\BoulderService;
 use Systemboard\Services\HoldService;
 use Systemboard\Services\LoginService;
+use Systemboard\Services\StatsService;
 use Systemboard\Services\UserService;
 use Systemboard\Services\WallService;
 
@@ -42,6 +43,7 @@ $services->set('database', function () {
 $services->set('boulderService', fn() => new BoulderService($services->get('database')));
 $services->set('holdService', fn() => new HoldService($services->get('database')));
 $services->set('loginService', fn() => new LoginService($services->get('database')));
+$services->set('statsService', fn() => new StatsService($services->get('database')));
 $services->set('userService', fn() => new UserService($services->get('database')));
 $services->set('wallService', fn() => new WallService($services->get('database')));
 

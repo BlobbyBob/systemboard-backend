@@ -26,6 +26,7 @@ use Systemboard\Services\BoulderService;
 use systemboard\Services\DefaultService;
 use Systemboard\Services\HoldService;
 use Systemboard\Services\LoginService;
+use Systemboard\Services\StatsService;
 use Systemboard\Services\UserService;
 use Systemboard\Services\WallService;
 
@@ -123,6 +124,17 @@ $putUserHandler = function (Request $request, Response $response, $args) {
         /** @var UserService $userService */
         $userService = $this->get('userService');
         return $userService->put($request, $response, $args);
+    }
+
+    return DefaultService::notImplemented($request, $response);
+};
+
+$getStatsHandler = function (Request $request, Response $response, $args) {
+
+    if ($this->has('statsService')) {
+        /** @var StatsService $statsService */
+        $statsService = $this->get('statsService');
+        return $statsService->get($request, $response, $args);
     }
 
     return DefaultService::notImplemented($request, $response);

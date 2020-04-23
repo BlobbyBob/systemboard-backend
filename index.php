@@ -35,6 +35,7 @@ $app->addBodyParsingMiddleware();
 $app->addRoutingMiddleware();
 $app->addErrorMiddleware(true, true, true);
 
+$app->get('/stats', $getStatsHandler);
 $app->get('/wall', $getWallHandler);
 $app->get('/wall/{id}', $getWallHandler);
 $app->get('/holds/{wall}', $getHoldsHandler);
