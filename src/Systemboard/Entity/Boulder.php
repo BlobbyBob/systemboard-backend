@@ -89,6 +89,22 @@ class Boulder extends AbstractEntity
         return null;
     }
 
+    public static function boulderOfTheDay(PDO $pdo): int
+    {
+        $stmt = $pdo->prepare("INSERT IGNORE INTO boulder_of_the_day SELECT NULL, bm.id, CURRENT_DATE FROM boulder_meta bm 
+            WHERE EXISTS (SELECT * FROM boulder b JOIN hold h ON b.holdid = h.id JOIN wall_segment ws ON h.wall_segment = ws.id 
+                WHERE b.boulderid = bm.id AND ws.wall = (SELECT MAX(w.id) FROM wall w)) ORDER BY RAND(?) LIMIT 1");
+        if (!$stmt->execute([time()])) {
+            return -1;
+        }
+
+        $stmt = $pdo->prepare('SELECT boulderid FROM boulder_of_the_day WHERE `date` = (SELECT MAX(date) FROM boulder_of_the_day)');
+        if ($stmt->execute() && $stmt->rowCount() > 0) {
+            [$id] = $stmt->fetch(PDO::FETCH_NUM);
+            return $id;
+        }
+    }
+
     public function resolve(PDO $pdo): bool
     {
         if (!$this->resolved) {

@@ -63,6 +63,17 @@ $getBoulderByIdHandler = function (Request $request, Response $response, $args) 
     return DefaultService::notImplemented($request, $response);
 };
 
+$getBoulderOfTheDayHandler = function (Request $request, Response $response, $args) {
+
+    if ($this->has('boulderService')) {
+        /** @var BoulderService $boulderService */
+        $boulderService = $this->get('boulderService');
+        return $boulderService->getBoulderOfTheDay($request, $response, $args);
+    }
+
+    return DefaultService::notImplemented($request, $response);
+};
+
 $getLoginHandler = function (Request $request, Response $response, $args) {
 
     if ($this->has('loginService')) {

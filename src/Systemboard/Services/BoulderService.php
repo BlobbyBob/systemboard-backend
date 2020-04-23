@@ -89,6 +89,12 @@ class BoulderService extends AbstractService
             ->withHeader('Content-Type', 'application/json; charset=utf8');
     }
 
+    public function getBoulderOfTheDay(Request $request, Response $response, $args)
+    {
+        $args['id'] = Boulder::boulderOfTheDay($this->pdo);
+        return $this->getById($request, $response, $args);
+    }
+
     public function post(Request $request, Response $response, $args)
     {
         $data = json_decode($request->getBody()->getContents());
