@@ -1,0 +1,47 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "type": "object",
+  "default": {},
+  "additionalProperties": true,
+  "required": [],
+  "properties": {
+    "id": {
+      "$id": "#/properties/id",
+      "type": "integer",
+      "title": "id",
+      "description": "The id won't be saved, but provide an additional validity check",
+      "examples": [
+        1
+      ],
+      "minimum": 0
+    },
+    "name": {
+      "$id": "#/properties/name",
+      "type": "string",
+      "title": "name",
+      "description": "New username",
+      "examples": [
+        "username"
+      ],
+      "minLength": 3
+    },
+    "email": {
+      "$id": "#/properties/password",
+      "type": "string",
+      "title": "password",
+      "description": "New password",
+      "examples": [
+        "emailaddress"
+      ]
+    },
+    "newsletter": {
+      "$id": "#/properties/newsletter",
+      "type": "boolean",
+      "title": "newsletter",
+      "description": "Toggle sending of the newsletter to this user",
+      "examples": [
+        false
+      ]
+    }
+  }
+}

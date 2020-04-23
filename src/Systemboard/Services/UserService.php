@@ -24,6 +24,8 @@ declare(strict_types=1);
 namespace Systemboard\Services;
 
 
+use Opis\JsonSchema\Schema;
+use Opis\JsonSchema\Validator;
 use PDO;
 use Slim\Psr7\Request;
 use Slim\Psr7\Response;
@@ -82,10 +84,48 @@ class UserService extends AbstractService
 
     public function put(Request $request, Response $response, $args)
     {
+        $data = json_decode($request->getBody()->getContents());
+        $schema = Schema::fromJsonString(file_get_contents('./schema/userPut.schema.json'));
+        $validator = new Validator();
+        $result = $validator->schemaValidation($data, $schema);
 
+        if (!$result->isValid()) {
+            return DefaultService::badRequest($request, $response);
+        }
+
+        $userid = (int) ($args['id'] ?? 0);
+        $user = User::load($this->pdo, $userid);
+
+        if (isset($data->id)) {
+            if ($user->id != $data->id) {
+                return DefaultService::badRequest($request, $response);
+            }
+        }
+
+        if (isset($data->name)) {
+            $user->name = (string) $data->name;
+        }
+
+        if (isset($data->password)) {
+            $hash = password_hash($data->password, PASSWORD_ARGON2I, ARGON_SETTINGS);
+            if (!$hash) {
+                return DefaultService::internalServerError($request, $response);
+            }
+            $user->password = $hash;
+        }
+
+        if (isset($data->newsletter)) {
+            $user->newsletter = (int) $data->newsletter;
+        }
+
+        if (!$user->save($this->pdo)) {
+            return DefaultService::badRequest($request, $response);
+        }
+
+        return $response
+            ->withStatus(204, 'No Content')
+            ->withHeader('Content-Type', 'application/json; charset=utf8');
     }
-
-
 
     private function statsForUser(User $user, ?int $wallid = null): PublicUserStats
     {

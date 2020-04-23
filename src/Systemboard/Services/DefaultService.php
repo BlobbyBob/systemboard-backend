@@ -45,6 +45,14 @@ class DefaultService
             ->withHeader('Content-Type', 'text/plain; charset=utf8');
     }
 
+    public static function internalServerError(Request $request, Response $response)
+    {
+        $response->getBody()->write('500 Internal Server Error');
+        return $response
+            ->withStatus(500, 'Internal Server Error')
+            ->withHeader("Content-Type", "text/plain");
+    }
+
     public static function notImplemented(Request $request, Response $response) {
         $response->getBody()->write('501 Not Implemented');
         return $response

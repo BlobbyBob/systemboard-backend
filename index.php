@@ -45,4 +45,6 @@ $app->get('/profile/{id}', $getUserPublicHandler);
 
 $app->post('/boulder', $postBoulderHandler);
 
+$app->put('/user/{id}', $putUserHandler);
+
 $app->run();

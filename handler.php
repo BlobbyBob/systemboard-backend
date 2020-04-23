@@ -105,3 +105,14 @@ $getUserPublicHandler = function (Request $request, Response $response, $args) {
 
     return DefaultService::notImplemented($request, $response);
 };
+
+$putUserHandler = function (Request $request, Response $response, $args) {
+
+    if ($this->has('userService')) {
+        /** @var UserService $userService */
+        $userService = $this->get('userService');
+        return $userService->put($request, $response, $args);
+    }
+
+    return DefaultService::notImplemented($request, $response);
+};
