@@ -34,6 +34,9 @@ class Boulder extends AbstractEntity
     public ?string $description;
     public $date;
 
+    private ?float $cachedGrade;
+    private ?float $cachedRating;
+
     /**
      * Boulder constructor.
      *
@@ -87,6 +90,51 @@ class Boulder extends AbstractEntity
         }
         $pdo->rollBack();
         return null;
+    }
+
+    /**
+     * @param PDO   $pdo
+     * @param array $constraints
+     * @param int   $limit
+     *
+     * @return Boulder[]
+     */
+    public static function search(PDO $pdo, array $constraints, int $limit = 3): array
+    {
+        // Preprocess constraints for sql's LIKE
+        $constraints[1] = '%' . str_replace('%', '%%', $constraints[1]) . '%';
+        $constraints[3] = '%' . str_replace('%', '%%', $constraints[3]) . '%';
+
+        // Append limit
+        $constraints[] = $limit;
+
+        $boulder = [];
+
+        $stmt = $pdo->prepare('SELECT bm.id, bm.name, bm.user, u.name, bm.description, bm.date, gv.grade, rv.stars FROM boulder_meta bm 
+            LEFT JOIN user u on bm.user = u.id 
+            LEFT JOIN grade_view gv ON bm.id = gv.boulder
+            LEFT JOIN rating_view rv on bm.id = rv.boulder WHERE
+            (? OR bm.name LIKE ?) AND
+            (? OR u.name LIKE ?) AND
+            (? OR bm.user = ?) AND
+            (? OR gv.grade >= ?) AND
+            (? OR gv.grade <= ?) AND
+            (? OR rv.stars >= ?) AND
+            (? OR rv.stars <= ?)
+            LIMIT ?');
+        if ($stmt->execute($constraints) && $stmt->rowCount() > 0) {
+            while (($row = $stmt->fetch(PDO::FETCH_NUM)) !== false) {
+                [$id, $name, $userid, $username, $description, $date, $grade, $rating] = $row;
+                $user = User::unresolved($userid);
+                $user->name = $username;
+                $b = new Boulder($id, $name, $user, $description, $date);
+                $b->cachedGrade = (float) $grade;
+                $b->cachedRating = (float) $rating;
+                $boulder[] = $b;
+            }
+        }
+
+        return $boulder;
     }
 
     public static function boulderOfTheDay(PDO $pdo): int
@@ -172,8 +220,10 @@ class Boulder extends AbstractEntity
         return 0;
     }
 
-    public function getRating(PDO $pdo): ?float
+    public function getRating(PDO $pdo, bool $cached = false): ?float
     {
+        if ($cached) return $this->cachedRating;
+
         $stmt = $pdo->prepare('SELECT stars FROM rating_view WHERE boulder = ?');
         if ($stmt->execute([$this->id]) && $stmt->rowCount() > 0) {
             [$stars] = $stmt->fetch(PDO::FETCH_NUM);
@@ -182,8 +232,10 @@ class Boulder extends AbstractEntity
         return null;
     }
 
-    public function getGrade(PDO $pdo): ?float
+    public function getGrade(PDO $pdo, bool $cached = false): ?float
     {
+        if ($cached) return $this->cachedGrade;
+
         $stmt = $pdo->prepare('SELECT grade FROM grade_view WHERE boulder = ?');
         if ($stmt->execute([$this->id]) && $stmt->rowCount() > 0) {
             [$grade] = $stmt->fetch(PDO::FETCH_NUM);

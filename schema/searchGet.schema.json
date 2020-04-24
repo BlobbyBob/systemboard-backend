@@ -1,0 +1,118 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "type": "object",
+  "default": {},
+  "additionalProperties": true,
+  "required": [],
+  "properties": {
+    "name": {
+      "$id": "#/properties/name",
+      "type": "string",
+      "title": "name",
+      "description": "Show only boulders with names similar to the value of this field"
+    },
+    "creator": {
+      "$id": "#/properties/creator",
+      "type": "string",
+      "title": "creator",
+      "description": "Show only boulders added by a creators with names similar to this value"
+    },
+    "creatorId": {
+      "$id": "#/properties/creatorId",
+      "type": "integer",
+      "title": "creatorId",
+      "description": "Show only boulders added by a specific creator",
+      "minimum": 1
+    },
+    "minGrade": {
+      "$id": "#/properties/minGrade",
+      "type": "number",
+      "title": "minGrade",
+      "description": "Minimum grade (inclusive) of the boulder",
+      "default": 8,
+      "minimum": 8,
+      "maximum": 24
+    },
+    "maxGrade": {
+      "$id": "#/properties/maxGrade",
+      "type": "number",
+      "title": "maxGrade",
+      "description": "Maximum grade (inclusive) of the boulder",
+      "default": 24,
+      "minimum": 8,
+      "maximum": 24
+    },
+    "minRating": {
+      "$id": "#/properties/minRating",
+      "type": "number",
+      "title": "minRating",
+      "description": "Minimum rating (inclusive) of the boulder",
+      "default": 1,
+      "minimum": 1,
+      "maximum": 5
+    },
+    "maxRating": {
+      "$id": "#/properties/maxRating",
+      "type": "number",
+      "title": "maxRating",
+      "description": "Maximum rating (inclusive) of the boulder",
+      "default": 5,
+      "minimum": 1,
+      "maximum": 5
+    },
+    "order": {
+      "$id": "#/properties/order",
+      "type": "array",
+      "title": "order",
+      "additionalItems": true,
+      "description": "Order of the search results",
+      "items": {
+        "$id": "#/properties/order/items",
+        "type": "object",
+        "title": "orderField",
+        "additionalProperties": true,
+        "required": [
+          "field",
+          "type"
+        ],
+        "properties": {
+          "field": {
+            "$id": "#/properties/order/items/properties/field",
+            "type": "string",
+            "title": "field",
+            "description": "Field to use for sorting",
+            "enum": [
+              "date",
+              "grade",
+              "rating"
+            ]
+          },
+          "type": {
+            "$id": "#/properties/order/items/properties/field",
+            "type": "string",
+            "title": "type",
+            "description": "Sorting direction",
+            "enum": [
+              "asc",
+              "desc"
+            ]
+          }
+        }
+      }
+    },
+    "climbed": {
+      "$id": "#/properties/climbed",
+      "type": "boolean",
+      "title": "climbed",
+      "description": "Filter, whether the results should contain only climbed or only not climbed boulders"
+    },
+    "page": {
+      "$id": "#/properties/page",
+      "type": "integer",
+      "title": "page",
+      "description": "Search result page",
+      "default": 1,
+      "minimum": 1
+    }
+  }
+}

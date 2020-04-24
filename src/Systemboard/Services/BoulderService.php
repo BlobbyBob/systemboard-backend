@@ -287,6 +287,65 @@ class BoulderService extends AbstractService
             ->withHeader('Content-Type', 'application/json; charset=utf8');
     }
 
+    public function search(Request $request, Response $response, $args)
+    {
+        $data = json_decode($request->getBody()->getContents());
+        $schema = Schema::fromJsonString(file_get_contents('./schema/searchGet.schema.json'));
+        $validator = new Validator();
+        $result = $validator->schemaValidation($data, $schema);
+
+        if (!$result->isValid()) {
+            return DefaultService::badRequest($request, $response);
+        }
+
+        $constraints = [];
+        $constraints[] = empty($data->name);
+        $constraints[] = $data->name ?? '';
+
+        $constraints[] = empty($data->creator);
+        $constraints[] = $data->creator ?? '';
+
+        $constraints[] = empty($data->creatorId);
+        $constraints[] = $data->creatorId ?? 0;
+
+        $constraints[] = empty($data->minGrade);
+        $constraints[] = $data->minGrade ?? 8;
+
+        $constraints[] = empty($data->maxGrade);
+        $constraints[] = $data->maxGrade ?? 24;
+
+        $constraints[] = empty($data->minRating);
+        $constraints[] = $data->minRating ?? 1;
+
+        $constraints[] = empty($data->maxRating);
+        $constraints[] = $data->maxRating ?? 5;
+
+        // todo implement order, climbed & page
+
+        $responseArray = [];
+        foreach (Boulder::search($this->pdo, $constraints) as $boulder) {
+            $publicBoulder = new PublicBoulder();
+            $publicBoulder->id = $boulder->id;
+            $publicBoulder->name = $boulder->name;
+            $publicBoulder->description = $boulder->description;
+            $publicBoulder->ascents = $boulder->fetchAscents($this->pdo);
+            $publicBoulder->climbed = rand(0, 1) ? true : false; // todo replace, when authentication is implemented
+            $publicBoulder->creator = new PublicCreator();
+            if (!is_null($boulder->user)) {
+                $publicBoulder->creator->id = $boulder->user->id;
+                $publicBoulder->creator->name = $boulder->user->name;
+            }
+            $publicBoulder->grade = $boulder->getGrade($this->pdo, true);
+            $publicBoulder->rating = $boulder->getRating($this->pdo, true);
+            $responseArray[] = $publicBoulder;
+        }
+
+        $response->getBody()->write(json_encode($responseArray));
+        return $response
+            ->withStatus(200, 'OK')
+            ->withHeader('Content-Type', 'application/json; charset=utf8');
+    }
+
     /**
      * Using the amount of special holds on each segment, compute the most important wall.
      * This method uses knowledge of the specifics of the gym

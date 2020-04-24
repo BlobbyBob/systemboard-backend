@@ -52,6 +52,17 @@ $getHoldsHandler = function (Request $request, Response $response, $args) {
     return DefaultService::notImplemented($request, $response);
 };
 
+$getLoginHandler = function (Request $request, Response $response, $args) {
+
+    if ($this->has('loginService')) {
+        /** @var LoginService $loginService */
+        $loginService = $this->get('loginService');
+        return $loginService->login($request, $response, $args);
+    }
+
+    return DefaultService::notImplemented($request, $response);
+};
+
 $getBoulderByIdHandler = function (Request $request, Response $response, $args) {
 
     if ($this->has('boulderService')) {
@@ -74,12 +85,12 @@ $getBoulderOfTheDayHandler = function (Request $request, Response $response, $ar
     return DefaultService::notImplemented($request, $response);
 };
 
-$getLoginHandler = function (Request $request, Response $response, $args) {
+$getBoulderSearchHandler = function (Request $request, Response $response, $args) {
 
-    if ($this->has('loginService')) {
-        /** @var LoginService $loginService */
-        $loginService = $this->get('loginService');
-        return $loginService->login($request, $response, $args);
+    if ($this->has('boulderService')) {
+        /** @var BoulderService $boulderService */
+        $boulderService = $this->get('boulderService');
+        return $boulderService->search($request, $response, $args);
     }
 
     return DefaultService::notImplemented($request, $response);
@@ -128,7 +139,6 @@ $putBoulderVoteHandler = function (Request $request, Response $response, $args) 
 
     return DefaultService::notImplemented($request, $response);
 };
-
 
 $deleteBoulderHandler = function (Request $request, Response $response, $args) {
 
