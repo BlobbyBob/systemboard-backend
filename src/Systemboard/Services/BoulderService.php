@@ -98,7 +98,7 @@ class BoulderService extends AbstractService
     public function post(Request $request, Response $response, $args)
     {
         $data = json_decode($request->getBody()->getContents());
-        $schema = Schema::fromJsonString(file_get_contents('./schema/boulderAdd.schema.json'));
+        $schema = Schema::fromJsonString(file_get_contents('./schema/boulderPost.schema.json'));
         $validator = new Validator();
         $result = $validator->schemaValidation($data, $schema);
 
@@ -115,9 +115,78 @@ class BoulderService extends AbstractService
             return DefaultService::badRequest($request, $response);
         }
 
-        $response->getBody()->write(json_encode($boulder));
+        $response->getBody()->write(json_encode($boulder)); // todo this doesn't seem correct
         return $response
             ->withStatus(200, 'OK')
+            ->withHeader('Content-Type', 'application/json; charset=utf8');
+    }
+
+    public function put(Request $request, Response $response, $args)
+    {
+        $id = (int) ($args['id'] ?? 0);
+
+        $data = json_decode($request->getBody()->getContents());
+        $schema = Schema::fromJsonString(file_get_contents('./schema/boulderPut.schema.json'));
+        $validator = new Validator();
+        $result = $validator->schemaValidation($data, $schema);
+
+        if (!$result->isValid()) {
+            return DefaultService::badRequest($request, $response);
+        }
+
+        $boulder = Boulder::load($this->pdo, $id);
+        if (is_null($boulder)) {
+            return DefaultService::notFound($request, $response);
+        }
+
+        // todo check if user is authorized
+        if (isset($data->name)) {
+            $boulder->name = (string) $data->name;
+        }
+
+        if (isset($data->description)) {
+            $boulder->description = (string) $data->description;
+        }
+
+        if (!$boulder->save($this->pdo)) {
+            return DefaultService::internalServerError($request, $response);
+        }
+
+        if (isset($data->grade)) {
+            $grade = (int) $data->grade;
+            $stmt = $this->pdo->prepare('INSERT INTO grade (boulder, user, grade) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE grade = ?');
+            if (!$stmt->execute([$boulder->id, 1, $grade, $grade])) {
+                return DefaultService::internalServerError($request, $response);
+            }
+        }
+
+        if (isset($data->rating)) {
+            $rating = (int) $data->rating;
+            $stmt = $this->pdo->prepare('INSERT INTO rating (boulder, user, stars) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE stars = ?');
+            if (!$stmt->execute([$boulder->id, 1, $rating, $rating])) {
+                return DefaultService::internalServerError($request, $response);
+            }
+        }
+
+        if (isset($data->holds)) {
+            $this->pdo->beginTransaction();
+            $stmt = $this->pdo->prepare('DELETE FROM boulder WHERE boulderid = ?');
+            if (!$stmt->execute([$boulder->id])) {
+                $this->pdo->rollBack();
+                return DefaultService::internalServerError($request, $response);
+            }
+            $stmt = $this->pdo->prepare('INSERT INTO boulder (boulderid, holdid, type) VALUES (?, ?, ?)');
+            foreach ($data->holds as $hold) {
+                if (!$stmt->execute([$boulder->id, $hold->id, $hold->type])) {
+                    $this->pdo->rollBack();
+                    return DefaultService::badRequest($request, $response);
+                }
+            }
+            $this->pdo->commit();
+        }
+
+        return $response
+            ->withStatus(204, 'No Content')
             ->withHeader('Content-Type', 'application/json; charset=utf8');
     }
 
@@ -190,6 +259,27 @@ class BoulderService extends AbstractService
             if (!$stmt->execute([$boulder->id, $user->id, $data->grade, $data->grade])) {
                 return DefaultService::internalServerError($request, $response);
             }
+        }
+
+        return $response
+            ->withStatus(204, 'No Content')
+            ->withHeader('Content-Type', 'application/json; charset=utf8');
+    }
+
+    public function delete(Request $request, Response $response, $args)
+    {
+        $id = (int) ($args['id'] ?? 0);
+
+        // todo check if boulder is on current wall and user is authorized
+        $boulder = Boulder::load($this->pdo, $id);
+
+        if (is_null($boulder)) {
+            return DefaultService::badRequest($request, $response);
+        }
+
+        $stmt = $this->pdo->prepare('DELETE FROM boulder_meta WHERE id = ?');
+        if (!$stmt->execute([$boulder->id])) {
+            return DefaultService::internalServerError($request, $response);
         }
 
         return $response

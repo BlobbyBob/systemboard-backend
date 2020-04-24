@@ -192,4 +192,12 @@ class Boulder extends AbstractEntity
         return null;
     }
 
+    public function save(PDO $pdo): bool
+    {
+        if (!$this->resolved) return false;
+
+        $stmt = $pdo->prepare('UPDATE boulder_meta SET name = ?, description = ?, user = ?, date = ? WHERE id = ?');
+        return $stmt->execute([$this->name, $this->description, $this->user->id, $this->date, $this->id]);
+    }
+
 }

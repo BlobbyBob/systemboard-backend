@@ -96,6 +96,17 @@ $postBoulderHandler = function (Request $request, Response $response, $args) {
     return DefaultService::notImplemented($request, $response);
 };
 
+$putBoulderHandler = function (Request $request, Response $response, $args) {
+
+    if ($this->has('boulderService')) {
+        /** @var BoulderService $boulderService */
+        $boulderService = $this->get('boulderService');
+        return $boulderService->put($request, $response, $args);
+    }
+
+    return DefaultService::notImplemented($request, $response);
+};
+
 $putBoulderClimbedHandler = function (Request $request, Response $response, $args) {
 
     if ($this->has('boulderService')) {
@@ -113,6 +124,18 @@ $putBoulderVoteHandler = function (Request $request, Response $response, $args) 
         /** @var BoulderService $boulderService */
         $boulderService = $this->get('boulderService');
         return $boulderService->putVote($request, $response, $args);
+    }
+
+    return DefaultService::notImplemented($request, $response);
+};
+
+
+$deleteBoulderHandler = function (Request $request, Response $response, $args) {
+
+    if ($this->has('boulderService')) {
+        /** @var BoulderService $boulderService */
+        $boulderService = $this->get('boulderService');
+        return $boulderService->delete($request, $response, $args);
     }
 
     return DefaultService::notImplemented($request, $response);
