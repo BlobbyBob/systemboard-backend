@@ -24,6 +24,7 @@ declare(strict_types=1);
 namespace Systemboard\Services;
 
 
+use Exception;
 use Slim\Psr7\Request;
 use Slim\Psr7\Response;
 use Systemboard\Entity\User;
@@ -37,7 +38,7 @@ class LoginService extends AbstractService
         $authtype = (string) ($args['authtype'] ?? 'password');
         $auth = (string) ($request->getQueryParams()['auth'] ?? '');
 
-        if (array_search($authtype, ['password', 'guest']) === false) {
+        if (array_search($authtype, ['password']) === false) {
             return DefaultService::notImplemented($request, $response);
         }
 
@@ -70,11 +71,11 @@ class LoginService extends AbstractService
                     $user->save($this->pdo);
                 }
             }
-            $token->token = $this->session($user);
+            $token->token = $this->createSession($user);
         }
 
-        if ($authtype == 'guest') {
-            $token->token = hash('sha256', 'guest');
+        if (empty($token->token)) {
+            return DefaultService::internalServerError($request, $response);
         }
 
         $response->getBody()->write(json_encode($token));
@@ -84,8 +85,25 @@ class LoginService extends AbstractService
             ->withHeader('Content-Type', 'application/json; charset=utf8');
     }
 
-    private function session(User $user): string
+    private function createSession(User $user): string
     {
+        $stmt = $this->pdo->prepare('INSERT INTO session (id, user, expires) VALUES (?, ?, ?)');
+        for ($i = 0; $i < 3; $i++) {
+            // Try at most 3 times
+            try {
+                $token = base64_encode(random_bytes(189));
+                if ($stmt->execute([$token, $user->id, date('Y-m-d H:i:s', time() + 7200)]) && $stmt->rowCount() > 0) {
+                    return $token;
+                }
+            } catch (Exception $e) {
+                // todo implement handling
+            }
+        }
         return '';
+    }
+
+    private function gc()
+    {
+        // todo implement garbage collection for old sessions
     }
 }

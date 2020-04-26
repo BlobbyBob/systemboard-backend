@@ -21,6 +21,7 @@
 declare(strict_types=1);
 
 use Slim\Factory\AppFactory;
+use Systemboard\Middleware\Authentication;
 
 require 'handler.php';
 require 'vendor/autoload.php';
@@ -30,6 +31,8 @@ $services = require 'services.php';
 
 AppFactory::setContainer($services);
 $app = AppFactory::create();
+
+$app->add(new Authentication($app->getContainer()->get('database')));
 
 $app->addBodyParsingMiddleware();
 $app->addRoutingMiddleware();
