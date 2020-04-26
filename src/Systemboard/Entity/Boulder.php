@@ -60,8 +60,8 @@ class Boulder extends AbstractEntity
     public static function load(PDO $pdo, int $id): ?Boulder
     {
         $stmt = $pdo->prepare('SELECT id, name, user, description, date FROM boulder_meta WHERE id = ?');
-        if ($stmt->execute([$id]) && $stmt->rowCount() > 0) {
-            [$id, $name, $user, $description, $date] = $stmt->fetch(PDO::FETCH_NUM);
+        if ($stmt->execute([$id]) && ($row = $stmt->fetch(PDO::FETCH_NUM)) !== false) {
+            [$id, $name, $user, $description, $date] = $row;
             return new Boulder($id, $name, User::unresolved($user), $description, $date);
         }
         return null;
@@ -122,7 +122,7 @@ class Boulder extends AbstractEntity
             (? OR rv.stars >= ?) AND
             (? OR rv.stars <= ?)
             LIMIT ?');
-        if ($stmt->execute($constraints) && $stmt->rowCount() > 0) {
+        if ($stmt->execute($constraints)) {
             while (($row = $stmt->fetch(PDO::FETCH_NUM)) !== false) {
                 [$id, $name, $userid, $username, $description, $date, $grade, $rating] = $row;
                 $user = User::unresolved($userid);
@@ -147,18 +147,20 @@ class Boulder extends AbstractEntity
         }
 
         $stmt = $pdo->prepare('SELECT boulderid FROM boulder_of_the_day WHERE `date` = (SELECT MAX(date) FROM boulder_of_the_day)');
-        if ($stmt->execute() && $stmt->rowCount() > 0) {
+        if ($stmt->execute()) {
             [$id] = $stmt->fetch(PDO::FETCH_NUM);
             return $id;
         }
+
+        return -1;
     }
 
     public function resolve(PDO $pdo): bool
     {
         if (!$this->resolved) {
             $stmt = $pdo->prepare('SELECT id, name, user, description, date FROM boulder_meta WHERE id = ?');
-            if ($stmt->execute([$this->id]) && $stmt->rowCount() > 0) {
-                [$this->id, $this->name, $user, $this->description, $this->date] = $stmt->fetch(PDO::FETCH_NUM);
+            if ($stmt->execute([$this->id]) && ($row = $stmt->fetch(PDO::FETCH_NUM)) !== false) {
+                [$this->id, $this->name, $user, $this->description, $this->date] = $row;
                 $this->user = User::unresolved($user);
                 $this->resolved = true;
             }
@@ -213,8 +215,8 @@ class Boulder extends AbstractEntity
     public function fetchAscents(PDO $pdo): int
     {
         $stmt = $pdo->prepare('SELECT count FROM climbed_view WHERE boulder = ?');
-        if ($stmt->execute([$this->id]) && $stmt->rowCount() > 0) {
-            [$count] = $stmt->fetch(PDO::FETCH_NUM);
+        if ($stmt->execute([$this->id]) && ($row = $stmt->fetch(PDO::FETCH_NUM)) !== false) {
+            [$count] = $row;
             return $count;
         }
         return 0;
@@ -225,8 +227,8 @@ class Boulder extends AbstractEntity
         if ($cached) return $this->cachedRating;
 
         $stmt = $pdo->prepare('SELECT stars FROM rating_view WHERE boulder = ?');
-        if ($stmt->execute([$this->id]) && $stmt->rowCount() > 0) {
-            [$stars] = $stmt->fetch(PDO::FETCH_NUM);
+        if ($stmt->execute([$this->id]) && ($row = $stmt->fetch(PDO::FETCH_NUM)) !== false) {
+            [$stars] = $row;
             return (float) $stars;
         }
         return null;
@@ -237,8 +239,8 @@ class Boulder extends AbstractEntity
         if ($cached) return $this->cachedGrade;
 
         $stmt = $pdo->prepare('SELECT grade FROM grade_view WHERE boulder = ?');
-        if ($stmt->execute([$this->id]) && $stmt->rowCount() > 0) {
-            [$grade] = $stmt->fetch(PDO::FETCH_NUM);
+        if ($stmt->execute([$this->id]) && ($row = $stmt->fetch(PDO::FETCH_NUM)) !== false) {
+            [$grade] = $row;
             return (float) $grade;
         }
         return null;

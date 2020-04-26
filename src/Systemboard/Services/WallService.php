@@ -67,10 +67,9 @@ class WallService extends AbstractService
     private function getCurrentId(): int
     {
         $stmt = $this->pdo->prepare('SELECT MAX(id) FROM wall');
-        if (!$stmt->execute() || $stmt->rowCount() == 0)
+        if (!$stmt->execute() || ($row = $stmt->fetch(PDO::FETCH_NUM)) === false)
             return 0;
 
-        $row = $stmt->fetch(PDO::FETCH_NUM);
         return $row[0];
     }
 }

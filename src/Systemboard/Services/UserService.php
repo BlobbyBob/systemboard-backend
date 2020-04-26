@@ -145,8 +145,8 @@ class UserService extends AbstractService
                 }
             }
             $stmt = $this->pdo->prepare('SELECT IFNULL(FLOOR(SUM(grade)), 0) FROM grade_view WHERE boulder IN (SELECT c.boulder FROM climbed c WHERE c.user = ?)');
-            if ($stmt->execute([$user->id]) && $stmt->rowCount() > 0) {
-                $stats->points = (int) $stmt->fetch(PDO::FETCH_NUM)[0];
+            if ($stmt->execute([$user->id]) && ($row = $stmt->fetch(PDO::FETCH_NUM)) !== false) {
+                $stats->points = (int) $row[0];
             }
         } else {
             // Get per wall stats
@@ -161,8 +161,8 @@ class UserService extends AbstractService
             }
             $stmt = $this->pdo->prepare('SELECT IFNULL(FLOOR(SUM(grade)), 0) FROM grade_view WHERE boulder IN (SELECT c.boulder FROM climbed c 
                         LEFT JOIN boulder_on_wall_view bowv on c.boulder = bowv.boulder WHERE c.user = ? AND bowv.wall IN (SELECT ws.id FROM wall_segment ws WHERE ws.wall = ?))');
-            if ($stmt->execute([$user->id, $wallid]) && $stmt->rowCount() > 0) {
-                $stats->points = (int) $stmt->fetch(PDO::FETCH_NUM)[0];
+            if ($stmt->execute([$user->id, $wallid]) && ($row = $stmt->fetch(PDO::FETCH_NUM)) !== false) {
+                $stats->points = (int) $row[0];
             }
         }
 

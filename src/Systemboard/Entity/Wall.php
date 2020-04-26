@@ -42,8 +42,8 @@ class Wall extends AbstractEntity
     public static function load(PDO $pdo, int $id): ?Wall
     {
         $stmt = $pdo->prepare('SELECT id, name FROM wall WHERE id = ?');
-        if ($stmt->execute([$id]) && $stmt->rowCount() > 0) {
-            [$id, $name] = $stmt->fetch(PDO::FETCH_NUM);
+        if ($stmt->execute([$id]) && ($row = $stmt->fetch(PDO::FETCH_NUM)) !== false) {
+            [$id, $name] = $row;
             return new Wall($id, $name);
         }
         return null;
@@ -58,8 +58,8 @@ class Wall extends AbstractEntity
     {
         if (!$this->resolved) {
             $stmt = $pdo->prepare('SELECT id, name FROM wall WHERE id = ?');
-            if ($stmt->execute([$this->id]) && $stmt->rowCount() > 0) {
-                [$this->id, $this->name] = $stmt->fetch(PDO::FETCH_NUM);
+            if ($stmt->execute([$this->id]) && ($row = $stmt->fetch(PDO::FETCH_NUM)) !== false) {
+                [$this->id, $this->name] = $row;
                 $this->resolved = true;
             }
         }

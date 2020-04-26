@@ -71,9 +71,9 @@ class Authentication implements MiddlewareInterface
 
             // todo refresh session duration
             $stmt = $this->pdo->prepare('SELECT user FROM session WHERE id = ?');
-            if ($stmt->execute([$parts[1]]) && $stmt->rowCount() > 0) {
+            if ($stmt->execute([$parts[1]]) && ($row = $stmt->fetch(PDO::FETCH_NUM)) !== false) {
                 $request = $request->withAttribute('login', true);
-                [$userid] = $stmt->fetch(PDO::FETCH_NUM);
+                [$userid] = $row;
                 $user = User::load($this->pdo, $userid);
                 if ($user == null) {
                     $response = new Response();

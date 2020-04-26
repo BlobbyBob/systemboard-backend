@@ -72,8 +72,8 @@ class User extends AbstractEntity
     public static function load(PDO $pdo, int $id): ?User
     {
         $stmt = $pdo->prepare('SELECT id, email, password, name, status, activation, newsletter, forgotpw, badge FROM user WHERE id = ?');
-        if ($stmt->execute([$id]) && $stmt->rowCount() > 0) {
-            [$id, $email, $password, $name, $status, $activation, $newsletter, $forgotpw, $badge] = $stmt->fetch(PDO::FETCH_NUM);
+        if ($stmt->execute([$id]) && ($row = $stmt->fetch(PDO::FETCH_NUM)) !== false) {
+            [$id, $email, $password, $name, $status, $activation, $newsletter, $forgotpw, $badge] = $row;
             return new User($id, $email, $password, $name, $status, $activation, $newsletter, $forgotpw, $badge);
         }
         return null;
@@ -82,8 +82,8 @@ class User extends AbstractEntity
     public static function loadByEmail(PDO $pdo, string $email): ?User
     {
         $stmt = $pdo->prepare('SELECT id, email, password, name, status, activation, newsletter, forgotpw, badge FROM user WHERE email = ?');
-        if ($stmt->execute([$email]) && $stmt->rowCount() > 0) {
-            [$id, $email, $password, $name, $status, $activation, $newsletter, $forgotpw, $badge] = $stmt->fetch(PDO::FETCH_NUM);
+        if ($stmt->execute([$email]) && ($row = $stmt->fetch(PDO::FETCH_NUM)) !== false) {
+            [$id, $email, $password, $name, $status, $activation, $newsletter, $forgotpw, $badge] = $row;
             return new User($id, $email, $password, $name, $status, $activation, $newsletter, $forgotpw, $badge);
         }
         return null;
@@ -98,8 +98,8 @@ class User extends AbstractEntity
     {
         if (!$this->resolved) {
             $stmt = $pdo->prepare('SELECT id, email, password, name, status, activation, newsletter, forgotpw, badge FROM user WHERE id = ?');
-            if ($stmt->execute([$this->id]) && $stmt->rowCount() > 0) {
-                [$this->id, $this->email, $this->password, $this->name, $this->status, $this->activation, $this->newsletter, $this->forgotpw, $this->badge] = $stmt->fetch(PDO::FETCH_NUM);
+            if ($stmt->execute([$this->id]) && ($row = $stmt->fetch(PDO::FETCH_NUM)) !== false) {
+                [$this->id, $this->email, $this->password, $this->name, $this->status, $this->activation, $this->newsletter, $this->forgotpw, $this->badge] = $row;
                 $this->resolved = true;
             }
         }

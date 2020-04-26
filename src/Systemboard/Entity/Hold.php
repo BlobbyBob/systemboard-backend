@@ -55,8 +55,8 @@ class Hold extends AbstractEntity
     public static function load(PDO $pdo, int $id): ?Hold
     {
         $stmt = $pdo->prepare('SELECT id, wall_segment, tag, attr FROM hold WHERE id = ?');
-        if ($stmt->execute([$id]) && $stmt->rowCount() > 0) {
-            [$id, $wallSegment, $tag, $attr] = $stmt->fetch(PDO::FETCH_NUM);
+        if ($stmt->execute([$id]) && ($row = $stmt->fetch(PDO::FETCH_NUM)) !== false) {
+            [$id, $wallSegment, $tag, $attr] = $row;
             return new Hold($id, WallSegment::unresolved($wallSegment), $tag, $attr);
         }
         return null;
@@ -72,7 +72,7 @@ class Hold extends AbstractEntity
     {
         $holds = [];
         $stmt = $pdo->prepare('SELECT id, tag, attr FROM hold WHERE wall_segment = ?');
-        if ($stmt->execute([$wallSegment->id]) && $stmt->rowCount() > 0) {
+        if ($stmt->execute([$wallSegment->id])) {
             while (($row = $stmt->fetch(PDO::FETCH_NUM)) !== false) {
                 [$id, $tag, $attr] = $row;
                 $holds[] = new Hold($id, $wallSegment, $tag, $attr);
@@ -90,8 +90,8 @@ class Hold extends AbstractEntity
     {
         if (!$this->resolved) {
             $stmt = $pdo->prepare('SELECT id, wall_segment, tag, attr FROM hold WHERE id = ?');
-            if ($stmt->execute([$this->id]) && $stmt->rowCount() > 0) {
-                [$this->id, $wallSegment, $this->tag, $this->attr] = $stmt->fetch(PDO::FETCH_NUM);
+            if ($stmt->execute([$this->id]) && ($row = $stmt->fetch(PDO::FETCH_NUM)) !== false) {
+                [$this->id, $wallSegment, $this->tag, $this->attr] = $row;
                 $this->wallSegment = WallSegment::unresolved($wallSegment);
                 $this->resolved = true;
             }

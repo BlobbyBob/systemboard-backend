@@ -53,8 +53,8 @@ class StatsService extends AbstractService
                                      WHERE ws.wall = (SELECT MAX(w.id) FROM wall w))),
            (SELECT COUNT(*) FROM user);');
 
-        if ($stmt->execute() && $stmt->rowCount() > 0) {
-            [$stats->boulder, $stats->holds, $stats->users] = $stmt->fetch(PDO::FETCH_NUM);
+        if ($stmt->execute() && ($row = $stmt->fetch(PDO::FETCH_NUM)) !== false) {
+            [$stats->boulder, $stats->holds, $stats->users] = $row;
         } else {
             return DefaultService::internalServerError($request, $response);
         }
