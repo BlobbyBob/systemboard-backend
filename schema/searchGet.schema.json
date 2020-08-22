@@ -60,6 +60,13 @@
       "minimum": 1,
       "maximum": 5
     },
+    "notDoneYet": {
+      "$id": "#/properties/notDoneYet",
+      "type": "boolean",
+      "title": "notDoneYet",
+      "description": "If true, search results should only contain boulder not done yet",
+      "default": false
+    },
     "order": {
       "$id": "#/properties/order",
       "type": "array",

@@ -1,0 +1,50 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "type": "object",
+  "default": {},
+  "additionalProperties": true,
+  "required": [
+    "name",
+    "email",
+    "password"
+  ],
+  "properties": {
+    "name": {
+      "$id": "#/properties/name",
+      "type": "string",
+      "title": "name",
+      "description": "Display name of the user",
+      "default": "",
+      "examples": [
+        "Bob"
+      ],
+      "pattern": "^[a-zA-Z0-9._-]{3,25}$|^[a-zA-Z0-9._-]{2,10} ?[a-zA-Z0-9._-]{3,14}$",
+      "minLength": 3,
+      "maxLength": 30
+    },
+    "email": {
+      "$id": "#/properties/email",
+      "type": "string",
+      "title": "email",
+      "description": "E-Mail of the user",
+      "default": "",
+      "examples": [
+        "alice@uni-bonn.de",
+        "bob@klettern.uni-bonn.de"
+      ],
+      "pattern": "^([a-zA-Z0-9.\\-_]+@([a-zA-Z.]+\\.)?uni-bonn\\.de)$",
+      "maxLength": 70
+    },
+    "password": {
+      "$id": "#/properties/password",
+      "type": "string",
+      "title": "password",
+      "description": "Password of the user",
+      "default": "",
+      "examples": [
+        "bobsSecretPassword"
+      ],
+      "minLength": 1
+    }
+  }
+}

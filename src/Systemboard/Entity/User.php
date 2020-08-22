@@ -69,6 +69,15 @@ class User extends AbstractEntity
         $this->resolved = !is_null($email) && !is_null($password) && !is_null($name) && !is_null($status) && !is_null($newsletter);
     }
 
+    public static function new(PDO $pdo, string $email, string $password, string $name, int $status, string $activation, int $newsletter): ?User
+    {
+        $stmt = $pdo->prepare('INSERT INTO user (email, password, name, status, activation, newsletter) VALUES (?, ?, ?, ?, ?, ?)');
+        if ($stmt->execute([$email, $password, $name, $status, $activation, $newsletter])) {
+            return self::loadByEmail($pdo, $email);
+        }
+        return null;
+    }
+
     public static function load(PDO $pdo, int $id): ?User
     {
         $stmt = $pdo->prepare('SELECT id, email, password, name, status, activation, newsletter, forgotpw, badge FROM user WHERE id = ?');

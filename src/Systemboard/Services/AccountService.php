@@ -25,6 +25,8 @@ namespace Systemboard\Services;
 
 
 use Exception;
+use Opis\JsonSchema\Schema;
+use Opis\JsonSchema\Validator;
 use Slim\Psr7\Request;
 use Slim\Psr7\Response;
 use Systemboard\Entity\User;
@@ -83,6 +85,27 @@ class AccountService extends AbstractService
         return $response
             ->withStatus(200, 'OK')
             ->withHeader('Content-Type', 'application/json; charset=utf8');
+    }
+
+    public function register(Request $request, Response $response, $args)
+    {
+        $data = json_decode($request->getBody()->getContents());
+        $schema = Schema::fromJsonString(file_get_contents('./schema/registrationPost.schema.json'));
+        $validator = new Validator();
+        $result = $validator->schemaValidation($data, $schema);
+
+        if (!$result->isValid()) {
+            return DefaultService::badRequest($request, $response);
+        }
+
+        $password = password_hash($data->password, PASSWORD_ARGON2I, ARGON_SETTINGS);
+        $activation = bin2hex(openssl_random_pseudo_bytes(30));
+        $user = User::new($this->pdo, $data->email, $password, $data->name, 0, $activation, 0);
+        if (is_null($user)) {
+            return DefaultService::badRequest($request, $response);
+        }
+
+        return $response->withStatus(204, 'No Content');
     }
 
     public function logout(Request $request, Response $response, $args) {
