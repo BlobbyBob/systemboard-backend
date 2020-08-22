@@ -35,4 +35,5 @@ class Boulder
     public ?float $grade;
     public ?float $rating;
     public Location $location;
+    public array $holds;
 }

@@ -21,6 +21,7 @@
 declare(strict_types=1);
 
 use Slim\Factory\AppFactory;
+use Slim\Psr7\Response;
 use Systemboard\Middleware\Authentication;
 
 require 'handler.php';
@@ -32,11 +33,10 @@ $services = require 'services.php';
 AppFactory::setContainer($services);
 $app = AppFactory::create();
 
-$app->add(new Authentication($app->getContainer()->get('database')));
-
 $app->addBodyParsingMiddleware();
 $app->addRoutingMiddleware();
 $app->addErrorMiddleware(true, true, true);
+$app->add(new Authentication($app->getContainer()->get('database')));
 
 $app->get('/stats', $getStatsHandler);
 $app->get('/wall', $getWallHandler);
@@ -49,7 +49,7 @@ $app->get('/user/{id}', $getUserPrivateHandler);
 $app->get('/profile/{id}', $getUserPublicHandler);
 
 $app->post('/boulder', $postBoulderHandler);
-$app->post('/search', $getBoulderSearchHandler);
+$app->post('/search', $postBoulderSearchHandler);
 
 $app->put('/user/{id}', $putUserHandler);
 $app->put('/boulder/{id}', $putBoulderHandler);

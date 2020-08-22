@@ -25,10 +25,12 @@ namespace Systemboard\Middleware;
 
 
 use PDO;
+use Psr\Http\Message\MessageInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface as RequestHandler;
+use Slim\Psr7\Headers;
 use Slim\Psr7\Response;
 use Systemboard\Entity\User;
 
@@ -48,6 +50,10 @@ class Authentication implements MiddlewareInterface
 
     public function process(Request $request, RequestHandler $handler): ResponseInterface
     {
+        if (strtoupper($request->getMethod()) == 'OPTIONS') {
+            return new Response(200, new Headers(["Access-Control-Allow-Origin" => "*", "Access-Control-Allow-Method" => "*", "Access-Control-Allow-Headers" => "*"]));
+        }
+
         $header = $request->getHeader('Authorization');
         if (count($header) == 0) {
             // No authentication is not allowed
@@ -95,6 +101,6 @@ class Authentication implements MiddlewareInterface
                 ->withStatus(401, 'Unauthorized');
         }
 
-        return $handler->handle($request);
+        return $handler->handle($request);//->withAddedHeader("Access-Control-Allow-Origin", "*");
     }
 }

@@ -65,6 +65,7 @@ class BoulderService extends AbstractService
         $responseObject->grade = $boulder->getGrade($this->pdo);
         $responseObject->rating = $boulder->getRating($this->pdo);
         $responseObject->location = new PublicLocation();
+        $responseObject->holds = [];
         $min = SEGMENTS_PER_WALL - 1;
         $max = 0;
         $main = [];
@@ -73,6 +74,8 @@ class BoulderService extends AbstractService
         foreach ($boulder->fetchHolds($this->pdo) as [$hold, $type]) {
             /** @var Hold $hold */
             $hold->resolve($this->pdo);
+            $responseObject->holds[$hold->id] = $type;
+
             if ($type == 2) {
                 $main[$hold->wallSegment->id % SEGMENTS_PER_WALL]++;
             }
@@ -319,6 +322,10 @@ class BoulderService extends AbstractService
 
         $constraints[] = empty($data->maxRating);
         $constraints[] = $data->maxRating ?? 5;
+
+        $constraints[] = empty($data->notDoneYet);
+        $constraints[] = $data->notDoneYet ?? false;
+
 
         // todo implement order, climbed & page
 

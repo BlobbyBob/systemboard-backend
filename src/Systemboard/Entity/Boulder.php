@@ -93,13 +93,14 @@ class Boulder extends AbstractEntity
     }
 
     /**
-     * @param PDO   $pdo
-     * @param array $constraints
-     * @param int   $limit
+     * @param PDO      $pdo
+     * @param array    $constraints
+     * @param int|null $userId
+     * @param int      $limit
      *
      * @return Boulder[]
      */
-    public static function search(PDO $pdo, array $constraints, int $limit = 3): array
+    public static function search(PDO $pdo, array $constraints, int $userId = null,  int $limit = 3): array
     {
         // Preprocess constraints for sql's LIKE
         $constraints[1] = '%' . str_replace('%', '%%', $constraints[1]) . '%';
@@ -120,7 +121,9 @@ class Boulder extends AbstractEntity
             (? OR gv.grade >= ?) AND
             (? OR gv.grade <= ?) AND
             (? OR rv.stars >= ?) AND
-            (? OR rv.stars <= ?)
+            (? OR rv.stars <= ?) AND
+            (? OR NOT EXISTS(SELECT * FROM climbed c WHERE c.user = u.id AND c.boulder = bm.id))
+            ORDER BY bm.id DESC
             LIMIT ?');
         if ($stmt->execute($constraints)) {
             while (($row = $stmt->fetch(PDO::FETCH_NUM)) !== false) {
@@ -178,8 +181,8 @@ class Boulder extends AbstractEntity
         $holds = [];
         $stmt = $pdo->prepare('SELECT holdid, type FROM boulder WHERE boulderid = ?');
         if ($stmt->execute([$this->id])) {
-            while (([$userid, $type] = $stmt->fetch(PDO::FETCH_NUM)) !== false) {
-                $holds[] = [Hold::unresolved($userid), $type];
+            while (([$holdid, $type] = $stmt->fetch(PDO::FETCH_NUM)) !== false) {
+                $holds[] = [Hold::unresolved($holdid), $type];
             }
         }
         return $holds;

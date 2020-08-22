@@ -31,6 +31,7 @@ use Systemboard\Services\UserService;
 use Systemboard\Services\WallService;
 
 $getWallHandler = function (Request $request, Response $response, $args) {
+    $response = $response->withHeader("Access-Control-Allow-Origin", "*")->withHeader("Access-Control-Allow-Method", "*")->withHeader("Access-Control-Allow-Header", "*");
 
     if ($this->has('wallService')) {
         /** @var WallService $wallService */
@@ -42,6 +43,7 @@ $getWallHandler = function (Request $request, Response $response, $args) {
 };
 
 $getHoldsHandler = function (Request $request, Response $response, $args) {
+    $response = $response->withHeader("Access-Control-Allow-Origin", "*")->withHeader("Access-Control-Allow-Method", "*")->withHeader("Access-Control-Allow-Header", "*");
 
     if ($this->has('holdService')) {
         /** @var HoldService $holdService */
@@ -53,6 +55,7 @@ $getHoldsHandler = function (Request $request, Response $response, $args) {
 };
 
 $getLoginHandler = function (Request $request, Response $response, $args) {
+    $response = $response->withHeader("Access-Control-Allow-Origin", "*")->withHeader("Access-Control-Allow-Method", "*")->withHeader("Access-Control-Allow-Header", "*");
 
     if ($this->has('loginService')) {
         /** @var LoginService $loginService */
@@ -64,6 +67,7 @@ $getLoginHandler = function (Request $request, Response $response, $args) {
 };
 
 $getBoulderByIdHandler = function (Request $request, Response $response, $args) {
+    $response = $response->withHeader("Access-Control-Allow-Origin", "*")->withHeader("Access-Control-Allow-Method", "*")->withHeader("Access-Control-Allow-Header", "*");
 
     if ($this->has('boulderService')) {
         /** @var BoulderService $boulderService */
@@ -75,6 +79,7 @@ $getBoulderByIdHandler = function (Request $request, Response $response, $args) 
 };
 
 $getBoulderOfTheDayHandler = function (Request $request, Response $response, $args) {
+    $response = $response->withHeader("Access-Control-Allow-Origin", "*")->withHeader("Access-Control-Allow-Method", "*")->withHeader("Access-Control-Allow-Header", "*");
 
     if ($this->has('boulderService')) {
         /** @var BoulderService $boulderService */
@@ -85,7 +90,8 @@ $getBoulderOfTheDayHandler = function (Request $request, Response $response, $ar
     return DefaultService::notImplemented($request, $response);
 };
 
-$getBoulderSearchHandler = function (Request $request, Response $response, $args) {
+$postBoulderSearchHandler = function (Request $request, Response $response, $args) {
+    $response = $response->withHeader("Access-Control-Allow-Origin", "*")->withHeader("Access-Control-Allow-Method", "*")->withHeader("Access-Control-Allow-Header", "*");
 
     if ($this->has('boulderService')) {
         /** @var BoulderService $boulderService */
@@ -97,6 +103,7 @@ $getBoulderSearchHandler = function (Request $request, Response $response, $args
 };
 
 $postBoulderHandler = function (Request $request, Response $response, $args) {
+    $response = $response->withHeader("Access-Control-Allow-Origin", "*")->withHeader("Access-Control-Allow-Method", "*")->withHeader("Access-Control-Allow-Header", "*");
 
     if ($this->has('boulderService')) {
         /** @var BoulderService $boulderService */
@@ -108,6 +115,7 @@ $postBoulderHandler = function (Request $request, Response $response, $args) {
 };
 
 $putBoulderHandler = function (Request $request, Response $response, $args) {
+    $response = $response->withHeader("Access-Control-Allow-Origin", "*")->withHeader("Access-Control-Allow-Method", "*")->withHeader("Access-Control-Allow-Header", "*");
 
     if ($this->has('boulderService')) {
         /** @var BoulderService $boulderService */
@@ -119,6 +127,7 @@ $putBoulderHandler = function (Request $request, Response $response, $args) {
 };
 
 $putBoulderClimbedHandler = function (Request $request, Response $response, $args) {
+    $response = $response->withHeader("Access-Control-Allow-Origin", "*")->withHeader("Access-Control-Allow-Method", "*")->withHeader("Access-Control-Allow-Header", "*");
 
     if ($this->has('boulderService')) {
         /** @var BoulderService $boulderService */
@@ -130,6 +139,7 @@ $putBoulderClimbedHandler = function (Request $request, Response $response, $arg
 };
 
 $putBoulderVoteHandler = function (Request $request, Response $response, $args) {
+    $response = $response->withHeader("Access-Control-Allow-Origin", "*")->withHeader("Access-Control-Allow-Method", "*")->withHeader("Access-Control-Allow-Header", "*");
 
     if ($this->has('boulderService')) {
         /** @var BoulderService $boulderService */
@@ -141,6 +151,7 @@ $putBoulderVoteHandler = function (Request $request, Response $response, $args) 
 };
 
 $deleteBoulderHandler = function (Request $request, Response $response, $args) {
+    $response = $response->withHeader("Access-Control-Allow-Origin", "*")->withHeader("Access-Control-Allow-Method", "*")->withHeader("Access-Control-Allow-Header", "*");
 
     if ($this->has('boulderService')) {
         /** @var BoulderService $boulderService */
@@ -152,6 +163,7 @@ $deleteBoulderHandler = function (Request $request, Response $response, $args) {
 };
 
 $getUserPrivateHandler = function (Request $request, Response $response, $args) {
+    $response = $response->withHeader("Access-Control-Allow-Origin", "*")->withHeader("Access-Control-Allow-Method", "*")->withHeader("Access-Control-Allow-Header", "*");
 
     if ($this->has('userService')) {
         /** @var UserService $userService */
@@ -163,6 +175,7 @@ $getUserPrivateHandler = function (Request $request, Response $response, $args) 
 };
 
 $getUserPublicHandler = function (Request $request, Response $response, $args) {
+    $response = $response->withHeader("Access-Control-Allow-Origin", "*")->withHeader("Access-Control-Allow-Method", "*")->withHeader("Access-Control-Allow-Header", "*");
 
     if ($this->has('userService')) {
         /** @var UserService $userService */
@@ -174,6 +187,7 @@ $getUserPublicHandler = function (Request $request, Response $response, $args) {
 };
 
 $putUserHandler = function (Request $request, Response $response, $args) {
+    $response = $response->withHeader("Access-Control-Allow-Origin", "*")->withHeader("Access-Control-Allow-Method", "*")->withHeader("Access-Control-Allow-Header", "*");
 
     if ($this->has('userService')) {
         /** @var UserService $userService */
@@ -185,6 +199,7 @@ $putUserHandler = function (Request $request, Response $response, $args) {
 };
 
 $getStatsHandler = function (Request $request, Response $response, $args) {
+    $response = $response->withHeader("Access-Control-Allow-Origin", "*")->withHeader("Access-Control-Allow-Method", "*")->withHeader("Access-Control-Allow-Header", "*");
 
     if ($this->has('statsService')) {
         /** @var StatsService $statsService */
