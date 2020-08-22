@@ -85,6 +85,20 @@ class LoginService extends AbstractService
             ->withHeader('Content-Type', 'application/json; charset=utf8');
     }
 
+    public function logout(Request $request, Response $response, $args) {
+        $sessionId = $request->getAttribute('sessionId');
+        if (!$sessionId) {
+            return DefaultService::badRequest($request, $response);
+        }
+
+        $stmt = $this->pdo->prepare('DELETE FROM session WHERE id = ?');
+        if ($stmt->execute([$sessionId])) {
+            return $response->withStatus(200, 'OK');
+        } else {
+            return DefaultService::internalServerError($request, $response);
+        }
+    }
+
     private function createSession(User $user): string
     {
         $stmt = $this->pdo->prepare('INSERT INTO session (id, user, expires) VALUES (?, ?, ?)');

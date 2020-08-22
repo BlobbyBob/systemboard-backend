@@ -58,8 +58,7 @@ class Authentication implements MiddlewareInterface
         if (count($header) == 0) {
             // No authentication is not allowed
             $response = new Response();
-            return $response
-                ->withStatus(401, 'Unauthorized');
+            return $response->withStatus(401, 'Unauthorized');
         }
 
         $parts = explode(' ', $header[0]);
@@ -67,8 +66,7 @@ class Authentication implements MiddlewareInterface
         if (count($parts) == 0) {
             // No authentication is not allowed
             $response = new Response();
-            return $response
-                ->withStatus(401, 'Unauthorized');
+            return $response->withStatus(401, 'Unauthorized');
         } else if (strtolower($parts[0]) == 'guest') {
 
             $request = $request->withAttribute('role', 'guest');
@@ -83,9 +81,9 @@ class Authentication implements MiddlewareInterface
                 $user = User::load($this->pdo, $userid);
                 if ($user == null) {
                     $response = new Response();
-                    return $response
-                        ->withStatus(500, 'Internal Server Error');
+                    return $response->withStatus(500, 'Internal Server Error');
                 }
+                $request = $request->withAttribute('sessionId', $parts[1]);
                 $request = $request->withAttribute('role', 'user');
                 $request = $request->withAttribute('user', $user);
             }
@@ -97,8 +95,7 @@ class Authentication implements MiddlewareInterface
         } else {
             // Unknown authentication scheme
             $response = new Response();
-            return $response
-                ->withStatus(401, 'Unauthorized');
+            return $response->withStatus(401, 'Unauthorized');
         }
 
         return $handler->handle($request);//->withAddedHeader("Access-Control-Allow-Origin", "*");

@@ -66,6 +66,18 @@ $getLoginHandler = function (Request $request, Response $response, $args) {
     return DefaultService::notImplemented($request, $response);
 };
 
+$getLogoutHandler = function (Request $request, Response $response, $args) {
+    $response = $response->withHeader("Access-Control-Allow-Origin", "*")->withHeader("Access-Control-Allow-Method", "*")->withHeader("Access-Control-Allow-Header", "*");
+
+    if ($this->has('loginService')) {
+        /** @var LoginService $loginService */
+        $loginService = $this->get('loginService');
+        return $loginService->logout($request, $response, $args);
+    }
+
+    return DefaultService::notImplemented($request, $response);
+};
+
 $getBoulderByIdHandler = function (Request $request, Response $response, $args) {
     $response = $response->withHeader("Access-Control-Allow-Origin", "*")->withHeader("Access-Control-Allow-Method", "*")->withHeader("Access-Control-Allow-Header", "*");
 

@@ -45,6 +45,7 @@ $app->get('/holds/{wall}', $getHoldsHandler);
 $app->get('/boulder/{id}', $getBoulderByIdHandler);
 $app->get('/boulderoftheday', $getBoulderOfTheDayHandler);
 $app->get('/login/{authtype}/{email}', $getLoginHandler);
+$app->get('/logout', $getLogoutHandler);
 $app->get('/user/{id}', $getUserPrivateHandler);
 $app->get('/profile/{id}', $getUserPublicHandler);
 
