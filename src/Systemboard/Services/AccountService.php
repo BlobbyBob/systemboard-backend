@@ -30,7 +30,7 @@ use Slim\Psr7\Response;
 use Systemboard\Entity\User;
 use Systemboard\PublicEntity\Token as TokenPublic;
 
-class LoginService extends AbstractService
+class AccountService extends AbstractService
 {
     public function login(Request $request, Response $response, $args)
     {

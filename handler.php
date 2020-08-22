@@ -25,7 +25,7 @@ use Slim\Psr7\Response;
 use Systemboard\Services\BoulderService;
 use systemboard\Services\DefaultService;
 use Systemboard\Services\HoldService;
-use Systemboard\Services\LoginService;
+use Systemboard\Services\AccountService;
 use Systemboard\Services\StatsService;
 use Systemboard\Services\UserService;
 use Systemboard\Services\WallService;
@@ -69,10 +69,10 @@ $getRankingHandler = function (Request $request, Response $response, $args) {
 $getLoginHandler = function (Request $request, Response $response, $args) {
     $response = $response->withHeader("Access-Control-Allow-Origin", "*")->withHeader("Access-Control-Allow-Method", "*")->withHeader("Access-Control-Allow-Header", "*");
 
-    if ($this->has('loginService')) {
-        /** @var LoginService $loginService */
-        $loginService = $this->get('loginService');
-        return $loginService->login($request, $response, $args);
+    if ($this->has('accountService')) {
+        /** @var AccountService $accountService */
+        $accountService = $this->get('accountService');
+        return $accountService->login($request, $response, $args);
     }
 
     return DefaultService::notImplemented($request, $response);
@@ -81,10 +81,10 @@ $getLoginHandler = function (Request $request, Response $response, $args) {
 $getLogoutHandler = function (Request $request, Response $response, $args) {
     $response = $response->withHeader("Access-Control-Allow-Origin", "*")->withHeader("Access-Control-Allow-Method", "*")->withHeader("Access-Control-Allow-Header", "*");
 
-    if ($this->has('loginService')) {
-        /** @var LoginService $loginService */
-        $loginService = $this->get('loginService');
-        return $loginService->logout($request, $response, $args);
+    if ($this->has('accountService')) {
+        /** @var AccountService $accountService */
+        $accountService = $this->get('accountService');
+        return $accountService->logout($request, $response, $args);
     }
 
     return DefaultService::notImplemented($request, $response);
