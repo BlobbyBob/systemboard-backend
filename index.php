@@ -48,6 +48,7 @@ $app->get('/login/{authtype}/{email}', $getLoginHandler);
 $app->get('/logout', $getLogoutHandler);
 $app->get('/user/{id}', $getUserPrivateHandler);
 $app->get('/profile/{id}', $getUserPublicHandler);
+$app->get('/ranking', $getRankingHandler);
 
 $app->post('/boulder', $postBoulderHandler);
 $app->post('/search', $postBoulderSearchHandler);

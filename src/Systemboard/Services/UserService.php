@@ -34,6 +34,7 @@ use Systemboard\PublicEntity\BoulderStub as PublicBoulderStub;
 use Systemboard\PublicEntity\UserInfo as PublicUserInfo;
 use Systemboard\PublicEntity\UserProfile as PublicUserProfile;
 use Systemboard\PublicEntity\UserStats as PublicUserStats;
+use Systemboard\PublicEntity\Ranking as PublicRanking;
 
 class UserService extends AbstractService
 {
@@ -74,6 +75,27 @@ class UserService extends AbstractService
         $responseObject->name = $user->name;
         $responseObject->current = $this->statsForUser($user, $wallid);
         $responseObject->total = $this->statsForUser($user);
+
+        $response->getBody()->write(json_encode($responseObject));
+
+        return $response
+            ->withStatus(200, 'OK')
+            ->withHeader('Content-Type', 'application/json; charset=utf8');
+    }
+
+    public function getRanking(Request $request, Response $response, $args)
+    {
+        $responseObject = [];
+
+        $stmt = $this->pdo->prepare('SELECT * FROM ranking ORDER BY score DESC');
+        if (!$stmt->execute()) {
+            return DefaultService::internalServerError($request, $response);
+        }
+        while (($row = $stmt->fetch(PDO::FETCH_NUM)) !== false) {
+            $ranking = new PublicRanking();
+            [$ranking->id, $ranking->name, $ranking->badge, $ranking->score] = $row;
+            $responseObject[] = $ranking;
+        }
 
         $response->getBody()->write(json_encode($responseObject));
 

@@ -54,6 +54,18 @@ $getHoldsHandler = function (Request $request, Response $response, $args) {
     return DefaultService::notImplemented($request, $response);
 };
 
+$getRankingHandler = function (Request $request, Response $response, $args) {
+    $response = $response->withHeader("Access-Control-Allow-Origin", "*")->withHeader("Access-Control-Allow-Method", "*")->withHeader("Access-Control-Allow-Header", "*");
+
+    if ($this->has('userService')) {
+        /** @var UserService $userService */
+        $userService = $this->get('userService');
+        return $userService->getRanking($request, $response, $args);
+    }
+
+    return DefaultService::notImplemented($request, $response);
+};
+
 $getLoginHandler = function (Request $request, Response $response, $args) {
     $response = $response->withHeader("Access-Control-Allow-Origin", "*")->withHeader("Access-Control-Allow-Method", "*")->withHeader("Access-Control-Allow-Header", "*");
 
