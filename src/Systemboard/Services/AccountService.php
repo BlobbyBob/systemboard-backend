@@ -87,6 +87,23 @@ class AccountService extends AbstractService
             ->withHeader('Content-Type', 'application/json; charset=utf8');
     }
 
+    private function createSession(User $user): string
+    {
+        $stmt = $this->pdo->prepare('INSERT INTO session (id, user, expires) VALUES (?, ?, ?)');
+        for ($i = 0; $i < 3; $i++) {
+            // Try at most 3 times
+            try {
+                $token = base64_encode(random_bytes(189));
+                if ($stmt->execute([$token, $user->id, date('Y-m-d H:i:s', time() + 7200)]) && $stmt->rowCount() > 0) {
+                    return $token;
+                }
+            } catch (Exception $e) {
+                // todo implement handling
+            }
+        }
+        return '';
+    }
+
     public function register(Request $request, Response $response, $args)
     {
         $data = json_decode($request->getBody()->getContents());
@@ -105,10 +122,28 @@ class AccountService extends AbstractService
             return DefaultService::badRequest($request, $response);
         }
 
+        $link = BASE_URL . '/?activation=' . urlencode($activation);
+        $content = <<<CONTENT
+Hallo $user->name,
+
+du kannst deine Registrierung für das digitale Bouldersystem über den folgenden Link abschließen:
+$link
+
+Sollte jemand deine E-Mailadresse missbräulich verwendet haben, brauchst du nichts weiter unternehmen. Du wirst in diesem Fall keine weitere E-Mail erhalten.
+
+Viele Grüße,
+dein Bouldersystem
+CONTENT;
+
+        if (!mail($user->email, "Digitales Bouldersystem: Registrierung", $content, "From: Digitales Bouldersystem <systemboard@digitalbread.de>\r\nContent-Type: text/plain; charset=UTF-8")) {
+            return DefaultService::internalServerError($request, $response);
+        }
+
         return $response->withStatus(204, 'No Content');
     }
 
-    public function logout(Request $request, Response $response, $args) {
+    public function logout(Request $request, Response $response, $args)
+    {
         $sessionId = $request->getAttribute('sessionId');
         if (!$sessionId) {
             return DefaultService::badRequest($request, $response);
@@ -120,23 +155,6 @@ class AccountService extends AbstractService
         } else {
             return DefaultService::internalServerError($request, $response);
         }
-    }
-
-    private function createSession(User $user): string
-    {
-        $stmt = $this->pdo->prepare('INSERT INTO session (id, user, expires) VALUES (?, ?, ?)');
-        for ($i = 0; $i < 3; $i++) {
-            // Try at most 3 times
-            try {
-                $token = base64_encode(random_bytes(189));
-                if ($stmt->execute([$token, $user->id, date('Y-m-d H:i:s', time() + 7200)]) && $stmt->rowCount() > 0) {
-                    return $token;
-                }
-            } catch (Exception $e) {
-                // todo implement handling
-            }
-        }
-        return '';
     }
 
     private function gc()
