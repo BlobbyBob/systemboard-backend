@@ -73,9 +73,10 @@ class Authentication implements MiddlewareInterface
 
         } else if (strtolower($parts[0]) == 'bearer' && count($parts) == 2) {
 
-            // todo refresh session duration
             $stmt = $this->pdo->prepare('SELECT user FROM session WHERE id = ?');
             if ($stmt->execute([$parts[1]]) && ($row = $stmt->fetch(PDO::FETCH_NUM)) !== false) {
+                $stmtRefresh = $this->pdo->prepare('UPDATE session SET expires = ? WHERE id = ?');
+                $stmtRefresh->execute([date('Y-m-d H:i:s', time() + SESSION_DURATION), $parts[1]]);
                 $request = $request->withAttribute('login', true);
                 [$userid] = $row;
                 $user = User::load($this->pdo, $userid);
@@ -98,6 +99,6 @@ class Authentication implements MiddlewareInterface
             return $response->withStatus(401, 'Unauthorized');
         }
 
-        return $handler->handle($request);//->withAddedHeader("Access-Control-Allow-Origin", "*");
+        return $handler->handle($request);
     }
 }

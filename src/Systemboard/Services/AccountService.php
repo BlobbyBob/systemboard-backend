@@ -44,6 +44,8 @@ class AccountService extends AbstractService
             return DefaultService::notImplemented($request, $response);
         }
 
+        if (mt_rand(0, 10) == 0) $this->gc();
+
         $token = new TokenPublic();
         if ($authtype == 'password') {
             $user = User::loadByEmail($this->pdo, $email);
@@ -85,23 +87,6 @@ class AccountService extends AbstractService
         return $response
             ->withStatus(200, 'OK')
             ->withHeader('Content-Type', 'application/json; charset=utf8');
-    }
-
-    private function createSession(User $user): string
-    {
-        $stmt = $this->pdo->prepare('INSERT INTO session (id, user, expires) VALUES (?, ?, ?)');
-        for ($i = 0; $i < 3; $i++) {
-            // Try at most 3 times
-            try {
-                $token = base64_encode(random_bytes(189));
-                if ($stmt->execute([$token, $user->id, date('Y-m-d H:i:s', time() + 7200)]) && $stmt->rowCount() > 0) {
-                    return $token;
-                }
-            } catch (Exception $e) {
-                // todo implement handling
-            }
-        }
-        return '';
     }
 
     public function register(Request $request, Response $response, $args)
@@ -265,8 +250,26 @@ MAIL;
         }
     }
 
+    private function createSession(User $user): string
+    {
+        $stmt = $this->pdo->prepare('INSERT INTO session (id, user, expires) VALUES (?, ?, ?)');
+        for ($i = 0; $i < 3; $i++) {
+            // Try at most 3 times
+            try {
+                $token = base64_encode(random_bytes(189));
+                if ($stmt->execute([$token, $user->id, date('Y-m-d H:i:s', time() + SESSION_DURATION)]) && $stmt->rowCount() > 0) {
+                    return $token;
+                }
+            } catch (Exception $e) {
+                // todo implement handling
+            }
+        }
+        return '';
+    }
+
     private function gc()
     {
-        // todo implement garbage collection for old sessions
+        $stmt = $this->pdo->prepare('DELETE FROM session WHERE expires < NOW()');
+        $stmt->execute([]);
     }
 }
