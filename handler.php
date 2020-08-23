@@ -102,6 +102,42 @@ $postActivationHandler = function (Request $request, Response $response, $args) 
     return DefaultService::notImplemented($request, $response);
 };
 
+$postPwResetHandler = function (Request $request, Response $response, $args) {
+    $response = $response->withHeader("Access-Control-Allow-Origin", "*")->withHeader("Access-Control-Allow-Method", "*")->withHeader("Access-Control-Allow-Header", "*");
+
+    if ($this->has('accountService')) {
+        /** @var AccountService $accountService */
+        $accountService = $this->get('accountService');
+        return $accountService->pwReset($request, $response, $args);
+    }
+
+    return DefaultService::notImplemented($request, $response);
+};
+
+$postPwResetMisuseHandler = function (Request $request, Response $response, $args) {
+    $response = $response->withHeader("Access-Control-Allow-Origin", "*")->withHeader("Access-Control-Allow-Method", "*")->withHeader("Access-Control-Allow-Header", "*");
+
+    if ($this->has('accountService')) {
+        /** @var AccountService $accountService */
+        $accountService = $this->get('accountService');
+        return $accountService->pwResetMisuse($request, $response, $args);
+    }
+
+    return DefaultService::notImplemented($request, $response);
+};
+
+$putPwResetHandler = function (Request $request, Response $response, $args) {
+    $response = $response->withHeader("Access-Control-Allow-Origin", "*")->withHeader("Access-Control-Allow-Method", "*")->withHeader("Access-Control-Allow-Header", "*");
+
+    if ($this->has('accountService')) {
+        /** @var AccountService $accountService */
+        $accountService = $this->get('accountService');
+        return $accountService->newPassword($request, $response, $args);
+    }
+
+    return DefaultService::notImplemented($request, $response);
+};
+
 $getLogoutHandler = function (Request $request, Response $response, $args) {
     $response = $response->withHeader("Access-Control-Allow-Origin", "*")->withHeader("Access-Control-Allow-Method", "*")->withHeader("Access-Control-Allow-Header", "*");
 

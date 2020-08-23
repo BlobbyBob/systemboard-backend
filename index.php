@@ -53,12 +53,15 @@ $app->get('/ranking', $getRankingHandler);
 $app->post('/boulder', $postBoulderHandler);
 $app->post('/search', $postBoulderSearchHandler);
 $app->post('/registration', $postRegistrationHandler);
-$app->post('/registration', $postActivationHandler);
+$app->post('/activation', $postActivationHandler);
+$app->post('/pwreset', $postPwResetHandler);
+$app->post('/misuse', $postPwResetMisuseHandler);
 
 $app->put('/user/{id}', $putUserHandler);
 $app->put('/boulder/{id}', $putBoulderHandler);
 $app->put('/boulder/{id}/climbed', $putBoulderClimbedHandler);
 $app->put('/boulder/{id}/vote', $putBoulderVoteHandler);
+$app->put('/pwreset/{token}', $putPwResetHandler);
 
 $app->delete('/boulder/{id}', $deleteBoulderHandler);
 

@@ -116,7 +116,7 @@ class AccountService extends AbstractService
         }
 
         $password = password_hash($data->password, PASSWORD_ARGON2I, ARGON_SETTINGS);
-        $activation = bin2hex(openssl_random_pseudo_bytes(30));
+        $activation = bin2hex(random_bytes(30)); // todo error handling
         $user = User::new($this->pdo, $data->email, $password, $data->name, 0, $activation, 0);
         if (is_null($user)) {
             return DefaultService::badRequest($request, $response);
@@ -145,7 +145,7 @@ CONTENT;
     public function activate(Request $request, Response $response, $args)
     {
         $data = json_decode($request->getBody()->getContents());
-        $schema = Schema::fromJsonString(file_get_contents('./schema/activationPost.schema.json'));
+        $schema = Schema::fromJsonString(file_get_contents('./schema/tokenPost.schema.json'));
         $validator = new Validator();
         $result = $validator->schemaValidation($data, $schema);
 
@@ -153,12 +153,98 @@ CONTENT;
             return DefaultService::badRequest($request, $response);
         }
 
-        $user = User::loadByActivation($this->pdo, $data->activation);
+        $user = User::loadByActivation($this->pdo, $data->token);
         if (is_null($user)) {
             return DefaultService::badRequest($request, $response);
         }
 
         $user->status = 1;
+        $user->save($this->pdo);
+
+        return $response->withStatus(204, 'No Content');
+    }
+
+    public function pwReset(Request $request, Response $response, $args)
+    {
+        $email = (string) ($args['email'] ?? '');
+
+        $data = json_decode($request->getBody()->getContents());
+        $schema = Schema::fromJsonString(file_get_contents('./schema/tokenPost.schema.json'));
+        $validator = new Validator();
+        $result = $validator->schemaValidation($data, $schema);
+
+        if (!$result->isValid()) {
+            return DefaultService::badRequest($request, $response);
+        }
+
+        $user = User::loadByEmail($this->pdo, $email);
+        if (is_null($user) || !empty($user->forgotpw)) {
+            return DefaultService::badRequest($request, $response);
+        }
+
+        $user->forgotpw = bin2hex(random_bytes(50)); // todo error handling
+        $user->save($this->pdo);
+
+        $forgotLink = BASE_URL . '/?forgotPw=' . $user->forgotpw;
+        $misuseLink = BASE_URL . '/?enableForgotPw=' . $user->forgotpw;
+
+        $content = <<<MAIL
+Hallo $user->name,
+
+jemand hat die Passwort-Vergessen Funktion des Digitalen Bouldersystems für deinen Account benutzt.
+
+Falls du dies NICHT gewesen bist, ist diese Funktion für deinen Account aus Sicherheitsgründen ab sofort deaktiviert.
+Falls du dein Passwort vergessen hast und ein neues Passwort setzen möchtest, klicke auf den folgenden Link: 
+$forgotLink
+
+Falls du zwar kein neues Passwort angefordert hast, aber die Funktion wieder aktivieren möchtest, klicke auf den folgenden Link:
+$misuseLink
+
+Viele Grüße,
+dein Bouldersystem
+MAIL;
+
+        mail($email, "Digitales Bouldersystem: Passwort vergessen", $content, "From: Verwaltung Bouldersystem <systemboard@digitalbread.de>\r\nContent-Type: text/plain; charset=UTF-8");
+
+        return $response->withStatus(204, 'No Content');
+    }
+
+    public function pwResetMisuse(Request $request, Response $response, $args)
+    {
+        $data = json_decode($request->getBody()->getContents());
+        $schema = Schema::fromJsonString(file_get_contents('./schema/tokenPost.schema.json'));
+        $validator = new Validator();
+        $result = $validator->schemaValidation($data, $schema);
+
+        if (!$result->isValid()) {
+            return DefaultService::badRequest($request, $response);
+        }
+
+        User::pwResetMisuse($this->pdo, $data->token);
+
+        return $response->withStatus(204, 'No Content');
+    }
+
+    public function newPassword(Request $request, Response $response, $args)
+    {
+        $token = (string) ($args['token'] ?? '');
+
+        $data = json_decode($request->getBody()->getContents());
+        $schema = Schema::fromJsonString(file_get_contents('./schema/passwordPut.schema.json'));
+        $validator = new Validator();
+        $result = $validator->schemaValidation($data, $schema);
+
+        if (!$result->isValid()) {
+            return DefaultService::badRequest($request, $response);
+        }
+
+        $user = User::loadByForgotPw($this->pdo, $token);
+        if (is_null($user)) {
+            return DefaultService::badRequest($request, $response);
+        }
+
+        $user->password = password_hash($data->password, PASSWORD_ARGON2I, ARGON_SETTINGS);
+        $user->forgotpw = null;
         $user->save($this->pdo);
 
         return $response->withStatus(204, 'No Content');

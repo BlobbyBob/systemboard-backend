@@ -4,18 +4,17 @@
   "default": {},
   "additionalProperties": true,
   "required": [
-    "activation"
+    "token"
   ],
   "properties": {
     "activation": {
-      "$id": "#/properties/activation",
+      "$id": "#/properties/token",
       "type": "string",
-      "title": "activation",
-      "description": "Activation Code for a user",
+      "title": "token",
+      "description": "Token",
       "examples": [
         "randomStringWithNumb4r5"
-      ],
-      "maxLength": 100
+      ]
     }
   }
 }

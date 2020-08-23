@@ -78,20 +78,20 @@ class User extends AbstractEntity
         return null;
     }
 
-    public static function load(PDO $pdo, int $id): ?User
+    public static function loadByEmail(PDO $pdo, string $email): ?User
     {
-        $stmt = $pdo->prepare('SELECT id, email, password, name, status, activation, newsletter, forgotpw, badge FROM user WHERE id = ?');
-        if ($stmt->execute([$id]) && ($row = $stmt->fetch(PDO::FETCH_NUM)) !== false) {
+        $stmt = $pdo->prepare('SELECT id, email, password, name, status, activation, newsletter, forgotpw, badge FROM user WHERE email = ?');
+        if ($stmt->execute([$email]) && ($row = $stmt->fetch(PDO::FETCH_NUM)) !== false) {
             [$id, $email, $password, $name, $status, $activation, $newsletter, $forgotpw, $badge] = $row;
             return new User($id, $email, $password, $name, $status, $activation, $newsletter, $forgotpw, $badge);
         }
         return null;
     }
 
-    public static function loadByEmail(PDO $pdo, string $email): ?User
+    public static function load(PDO $pdo, int $id): ?User
     {
-        $stmt = $pdo->prepare('SELECT id, email, password, name, status, activation, newsletter, forgotpw, badge FROM user WHERE email = ?');
-        if ($stmt->execute([$email]) && ($row = $stmt->fetch(PDO::FETCH_NUM)) !== false) {
+        $stmt = $pdo->prepare('SELECT id, email, password, name, status, activation, newsletter, forgotpw, badge FROM user WHERE id = ?');
+        if ($stmt->execute([$id]) && ($row = $stmt->fetch(PDO::FETCH_NUM)) !== false) {
             [$id, $email, $password, $name, $status, $activation, $newsletter, $forgotpw, $badge] = $row;
             return new User($id, $email, $password, $name, $status, $activation, $newsletter, $forgotpw, $badge);
         }
@@ -106,6 +106,22 @@ class User extends AbstractEntity
             return new User($id, $email, $password, $name, $status, $activation, $newsletter, $forgotpw, $badge);
         }
         return null;
+    }
+
+    public static function loadByForgotPw(PDO $pdo, string $forgotpw): ?User
+    {
+        $stmt = $pdo->prepare('SELECT id, email, password, name, status, activation, newsletter, forgotpw, badge FROM user WHERE forgotpw = ?');
+        if ($stmt->execute([$forgotpw]) && ($row = $stmt->fetch(PDO::FETCH_NUM)) !== false) {
+            [$id, $email, $password, $name, $status, $activation, $newsletter, $forgotpw, $badge] = $row;
+            return new User($id, $email, $password, $name, $status, $activation, $newsletter, $forgotpw, $badge);
+        }
+        return null;
+    }
+
+    public static function pwResetMisuse(PDO $pdo, string $token): bool
+    {
+        $stmt = $pdo->prepare('UPDATE user SET forgotpw = NULL WHERE forgotpw = ?');
+        return $stmt->execute([$token]);
     }
 
     public static function unresolved(int $id)
