@@ -53,6 +53,7 @@ $app->get('/ranking', $getRankingHandler);
 $app->post('/boulder', $postBoulderHandler);
 $app->post('/search', $postBoulderSearchHandler);
 $app->post('/registration', $postRegistrationHandler);
+$app->post('/registration', $postActivationHandler);
 
 $app->put('/user/{id}', $putUserHandler);
 $app->put('/boulder/{id}', $putBoulderHandler);

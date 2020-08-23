@@ -1,0 +1,21 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "type": "object",
+  "default": {},
+  "additionalProperties": true,
+  "required": [
+    "activation"
+  ],
+  "properties": {
+    "activation": {
+      "$id": "#/properties/activation",
+      "type": "string",
+      "title": "activation",
+      "description": "Activation Code for a user",
+      "examples": [
+        "randomStringWithNumb4r5"
+      ],
+      "maxLength": 100
+    }
+  }
+}

@@ -90,6 +90,18 @@ $postRegistrationHandler = function (Request $request, Response $response, $args
     return DefaultService::notImplemented($request, $response);
 };
 
+$postActivationHandler = function (Request $request, Response $response, $args) {
+    $response = $response->withHeader("Access-Control-Allow-Origin", "*")->withHeader("Access-Control-Allow-Method", "*")->withHeader("Access-Control-Allow-Header", "*");
+
+    if ($this->has('accountService')) {
+        /** @var AccountService $accountService */
+        $accountService = $this->get('accountService');
+        return $accountService->activate($request, $response, $args);
+    }
+
+    return DefaultService::notImplemented($request, $response);
+};
+
 $getLogoutHandler = function (Request $request, Response $response, $args) {
     $response = $response->withHeader("Access-Control-Allow-Origin", "*")->withHeader("Access-Control-Allow-Method", "*")->withHeader("Access-Control-Allow-Header", "*");
 

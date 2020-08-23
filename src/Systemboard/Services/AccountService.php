@@ -142,6 +142,28 @@ CONTENT;
         return $response->withStatus(204, 'No Content');
     }
 
+    public function activate(Request $request, Response $response, $args)
+    {
+        $data = json_decode($request->getBody()->getContents());
+        $schema = Schema::fromJsonString(file_get_contents('./schema/activationPost.schema.json'));
+        $validator = new Validator();
+        $result = $validator->schemaValidation($data, $schema);
+
+        if (!$result->isValid()) {
+            return DefaultService::badRequest($request, $response);
+        }
+
+        $user = User::loadByActivation($this->pdo, $data->activation);
+        if (is_null($user)) {
+            return DefaultService::badRequest($request, $response);
+        }
+
+        $user->status = 1;
+        $user->save($this->pdo);
+
+        return $response->withStatus(204, 'No Content');
+    }
+
     public function logout(Request $request, Response $response, $args)
     {
         $sessionId = $request->getAttribute('sessionId');

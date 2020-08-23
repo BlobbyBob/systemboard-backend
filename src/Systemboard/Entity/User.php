@@ -98,6 +98,16 @@ class User extends AbstractEntity
         return null;
     }
 
+    public static function loadByActivation(PDO $pdo, string $activation): ?User
+    {
+        $stmt = $pdo->prepare('SELECT id, email, password, name, status, activation, newsletter, forgotpw, badge FROM user WHERE activation = ?');
+        if ($stmt->execute([$activation]) && ($row = $stmt->fetch(PDO::FETCH_NUM)) !== false) {
+            [$id, $email, $password, $name, $status, $activation, $newsletter, $forgotpw, $badge] = $row;
+            return new User($id, $email, $password, $name, $status, $activation, $newsletter, $forgotpw, $badge);
+        }
+        return null;
+    }
+
     public static function unresolved(int $id)
     {
         return new User($id);
