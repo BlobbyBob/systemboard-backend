@@ -51,14 +51,15 @@ class Authentication implements MiddlewareInterface
 
     public function process(Request $request, RequestHandler $handler): ResponseInterface
     {
+        $response = new Response(200, new Headers(["Access-Control-Allow-Origin" => "*", "Access-Control-Allow-Method" => "*", "Access-Control-Allow-Headers" => "*"]));
+
         if (strtoupper($request->getMethod()) == 'OPTIONS') {
-            return new Response(200, new Headers(["Access-Control-Allow-Origin" => "*", "Access-Control-Allow-Method" => "*", "Access-Control-Allow-Headers" => "*"]));
+            return $response;
         }
 
         $header = $request->getHeader('Authorization');
         if (count($header) == 0) {
             // No authentication is not allowed
-            $response = new Response();
             return $response->withStatus(401, 'Unauthorized');
         }
 
@@ -66,7 +67,6 @@ class Authentication implements MiddlewareInterface
 
         if (count($parts) == 0) {
             // No authentication is not allowed
-            $response = new Response();
             return $response->withStatus(401, 'Unauthorized');
         } else if (strtolower($parts[0]) == 'guest') {
 
@@ -82,14 +82,13 @@ class Authentication implements MiddlewareInterface
                 [$userid] = $row;
                 $user = User::load($this->pdo, $userid);
                 if ($user == null) {
-                    $response = new Response();
                     return $response->withStatus(500, 'Internal Server Error');
                 }
                 $request = $request->withAttribute('sessionId', $parts[1]);
                 $request = $request->withAttribute('role', 'user');
                 $request = $request->withAttribute('user', $user);
             } else {
-                return (new Response())->withStatus(401, 'Unauthorized');
+                return $response->withStatus(401, 'Unauthorized');
             }
 
         } else if (strtolower($parts[0]) == 'login') {
@@ -98,10 +97,9 @@ class Authentication implements MiddlewareInterface
 
         } else {
             // Unknown authentication scheme
-            $response = new Response();
             return $response->withStatus(401, 'Unauthorized');
         }
 
-        return $handler->handle($request);
+        return $handler->handle($request)->withHeader("Access-Control-Allow-Origin", "*")->withHeader("Access-Control-Allow-Method", "*")->withHeader("Access-Control-Allow-Header", "*");
     }
 }

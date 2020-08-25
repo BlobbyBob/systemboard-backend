@@ -21,12 +21,11 @@
 declare(strict_types=1);
 
 use Slim\Factory\AppFactory;
-use Slim\Psr7\Response;
 use Systemboard\Middleware\Authentication;
 
-require 'handler.php';
 require 'vendor/autoload.php';
 require 'src/autoload.php';
+require 'handler.php';
 
 $services = require 'services.php';
 

@@ -40,6 +40,7 @@ $services->set('database', function () {
     return $pdo;
 });
 
+$services->set('accountService', fn() => new AccountService($services->get('database')));
 $services->set('boulderService', fn() => new BoulderService($services->get('database')));
 $services->set('holdService', fn() => new HoldService($services->get('database')));
 $services->set('loginService', fn() => new AccountService($services->get('database')));
