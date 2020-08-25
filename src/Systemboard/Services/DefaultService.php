@@ -59,4 +59,12 @@ class DefaultService
             ->withStatus(501, 'Not Implemented')
             ->withHeader("Content-Type", "text/plain");
     }
+
+    public static function forbidden(Request $request, Response $response)
+    {
+        $response->getBody()->write('403 Forbidden');
+        return $response
+            ->withStatus(403, 'Forbidden')
+            ->withHeader("Content-Type", "text/plain");
+    }
 }

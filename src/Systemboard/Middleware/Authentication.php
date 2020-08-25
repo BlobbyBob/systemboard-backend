@@ -33,6 +33,7 @@ use Psr\Http\Server\RequestHandlerInterface as RequestHandler;
 use Slim\Psr7\Headers;
 use Slim\Psr7\Response;
 use Systemboard\Entity\User;
+use Systemboard\Services\DefaultService;
 
 class Authentication implements MiddlewareInterface
 {
@@ -87,6 +88,8 @@ class Authentication implements MiddlewareInterface
                 $request = $request->withAttribute('sessionId', $parts[1]);
                 $request = $request->withAttribute('role', 'user');
                 $request = $request->withAttribute('user', $user);
+            } else {
+                return (new Response())->withStatus(401, 'Unauthorized');
             }
 
         } else if (strtolower($parts[0]) == 'login') {

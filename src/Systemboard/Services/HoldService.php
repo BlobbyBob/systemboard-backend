@@ -35,6 +35,10 @@ class HoldService extends AbstractService
 {
     public function get(Request $request, Response $response, $args)
     {
+        if ($request->getAttribute('role') != 'user' && $request->getAttribute('role') != 'guest') {
+            return DefaultService::forbidden($request, $response);
+        }
+
         $wallid = (int) ($args['wall'] ?? 0);
 
         if ($wallid <= 0) {

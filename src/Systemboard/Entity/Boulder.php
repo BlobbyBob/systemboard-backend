@@ -205,6 +205,15 @@ class Boulder extends AbstractEntity
         return $climbers;
     }
 
+    public function climbedBy(PDO $pdo, User $user): bool
+    {
+        $stmt = $pdo->prepare('SELECT COUNT(*) FROM climbed WHERE user = ? AND boulder = ?');
+        if ($stmt->execute([$user->id, $this->id]) && $stmt->fetchColumn() > 0) {
+            return true;
+        }
+        return false;
+    }
+
     public function isBoulderOfTheDay(PDO $pdo): bool
     {
         $stmt = $pdo->prepare('SELECT COUNT(*) FROM boulder_of_the_day WHERE boulderid = ? AND date = CURRENT_DATE');

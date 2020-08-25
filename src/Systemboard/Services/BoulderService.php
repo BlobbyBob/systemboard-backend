@@ -37,8 +37,22 @@ use Systemboard\PublicEntity\Location as PublicLocation;
 
 class BoulderService extends AbstractService
 {
+    public function getBoulderOfTheDay(Request $request, Response $response, $args)
+    {
+        if ($request->getAttribute('role') != 'guest' && $request->getAttribute('role') != 'user') {
+            return DefaultService::forbidden($request, $response);
+        }
+
+        $args['id'] = Boulder::boulderOfTheDay($this->pdo);
+        return $this->getById($request, $response, $args);
+    }
+
     public function getById(Request $request, Response $response, $args)
     {
+        if ($request->getAttribute('role') != 'guest' && $request->getAttribute('role') != 'user') {
+            return DefaultService::forbidden($request, $response);
+        }
+
         $id = (int) ($args['id'] ?? 0);
 
         if ($id <= 0) {
@@ -92,14 +106,40 @@ class BoulderService extends AbstractService
             ->withHeader('Content-Type', 'application/json; charset=utf8');
     }
 
-    public function getBoulderOfTheDay(Request $request, Response $response, $args)
+    /**
+     * Using the amount of special holds on each segment, compute the most important wall.
+     * This method uses knowledge of the specifics of the gym
+     *
+     * @param array $amounts
+     *
+     * @return int
+     */
+    private function computeMainWall(array $amounts): int
     {
-        $args['id'] = Boulder::boulderOfTheDay($this->pdo);
-        return $this->getById($request, $response, $args);
+        if (count($amounts) != 3) {
+            $mainIndex = 0;
+            $mainAmount = 0;
+            foreach ($amounts as $index => $amount) {
+                if ($amount > $mainAmount) {
+                    $mainIndex = $index;
+                    $mainAmount = $amount;
+                }
+            }
+            return $mainIndex;
+        }
+
+        if ($amounts[1] >= $amounts[0] && $amounts[1] >= $amounts[2])
+            return 1;
+
+        return $amounts[0] >= $amounts[2] ? 0 : 2;
     }
 
     public function post(Request $request, Response $response, $args)
     {
+        if ($request->getAttribute('role') != 'user') {
+            return DefaultService::forbidden($request, $response);
+        }
+
         $data = json_decode($request->getBody()->getContents());
         $schema = Schema::fromJsonString(file_get_contents('./schema/boulderPost.schema.json'));
         $validator = new Validator();
@@ -113,12 +153,12 @@ class BoulderService extends AbstractService
         foreach ($data->holds as $hold) {
             $holds[] = [$hold->id, $hold->type];
         }
-        $boulder = Boulder::create($this->pdo, $data->name, User::unresolved(1), $data->description, $holds); // todo adjust, when authentication is implemented
+        $boulder = Boulder::create($this->pdo, $data->name, $request->getAttribute('user'), $data->description, $holds);
         if (is_null($boulder)) {
             return DefaultService::badRequest($request, $response);
         }
 
-        $response->getBody()->write(json_encode($boulder)); // todo this doesn't seem correct
+        $response->getBody()->write(json_encode($boulder)); // todo convert to public boulder before outputting
         return $response
             ->withStatus(200, 'OK')
             ->withHeader('Content-Type', 'application/json; charset=utf8');
@@ -126,6 +166,10 @@ class BoulderService extends AbstractService
 
     public function put(Request $request, Response $response, $args)
     {
+        if ($request->getAttribute('role') != 'user') {
+            return DefaultService::forbidden($request, $response);
+        }
+
         $id = (int) ($args['id'] ?? 0);
 
         $data = json_decode($request->getBody()->getContents());
@@ -142,7 +186,10 @@ class BoulderService extends AbstractService
             return DefaultService::notFound($request, $response);
         }
 
-        // todo check if user is authorized
+        if ($boulder->user->id != $request->getAttribute('user')->id) {
+            return DefaultService::forbidden($request, $response);
+        }
+
         if (isset($data->name)) {
             $boulder->name = (string) $data->name;
         }
@@ -195,6 +242,10 @@ class BoulderService extends AbstractService
 
     public function putClimbed(Request $request, Response $response, $args)
     {
+        if ($request->getAttribute('role') != 'user') {
+            return DefaultService::forbidden($request, $response);
+        }
+
         $id = (int) ($args['id'] ?? 0);
 
         $data = json_decode($request->getBody()->getContents());
@@ -206,7 +257,7 @@ class BoulderService extends AbstractService
             return DefaultService::badRequest($request, $response);
         }
 
-        $user = User::load($this->pdo, 1); // todo use authorized user
+        $user = $request->getAttribute('user');
         $boulder = Boulder::load($this->pdo, $id);
         // todo check if boulder is on current wall
 
@@ -233,6 +284,10 @@ class BoulderService extends AbstractService
 
     public function putVote(Request $request, Response $response, $args)
     {
+        if ($request->getAttribute('role') != 'user') {
+            return DefaultService::forbidden($request, $response);
+        }
+
         $id = (int) ($args['id'] ?? 0);
 
         $data = json_decode($request->getBody()->getContents());
@@ -244,7 +299,7 @@ class BoulderService extends AbstractService
             return DefaultService::badRequest($request, $response);
         }
 
-        $user = User::load($this->pdo, 1); // todo use authorized user
+        $user = $request->getAttribute('user');
         $boulder = Boulder::load($this->pdo, $id);
         // todo check if boulder is on current wall
 
@@ -271,10 +326,18 @@ class BoulderService extends AbstractService
 
     public function delete(Request $request, Response $response, $args)
     {
+        if ($request->getAttribute('role') != 'user') {
+            return DefaultService::forbidden($request, $response);
+        }
+
         $id = (int) ($args['id'] ?? 0);
 
-        // todo check if boulder is on current wall and user is authorized
+        // todo check if boulder is on current wall
         $boulder = Boulder::load($this->pdo, $id);
+
+        if ($request->getAttribute('user')->id != $boulder->user->id) {
+            return DefaultService::forbidden($request, $response);
+        }
 
         if (is_null($boulder)) {
             return DefaultService::badRequest($request, $response);
@@ -292,6 +355,10 @@ class BoulderService extends AbstractService
 
     public function search(Request $request, Response $response, $args)
     {
+        if ($request->getAttribute('role') != 'user' && $request->getAttribute('role') != 'guest') {
+            return DefaultService::forbidden($request, $response);
+        }
+
         $data = json_decode($request->getBody()->getContents());
         $schema = Schema::fromJsonString(file_get_contents('./schema/searchGet.schema.json'));
         $validator = new Validator();
@@ -323,8 +390,13 @@ class BoulderService extends AbstractService
         $constraints[] = empty($data->maxRating);
         $constraints[] = $data->maxRating ?? 5;
 
-        $constraints[] = empty($data->notDoneYet);
-        $constraints[] = $data->notDoneYet ?? false;
+        if ($request->getAttribute('role') == 'guest') {
+            $constraints[] = false;
+            $constraints[] = false;
+        } else {
+            $constraints[] = empty($data->notDoneYet);
+            $constraints[] = $data->notDoneYet ?? false;
+        }
 
 
         // todo implement order, climbed & page
@@ -336,7 +408,7 @@ class BoulderService extends AbstractService
             $publicBoulder->name = $boulder->name;
             $publicBoulder->description = $boulder->description;
             $publicBoulder->ascents = $boulder->fetchAscents($this->pdo);
-            $publicBoulder->climbed = rand(0, 1) ? true : false; // todo replace, when authentication is implemented
+            $publicBoulder->climbed = $request->getAttribute('role') == 'guest' ? false : $boulder->climbedBy($this->pdo, $request->getAttribute('user'));
             $publicBoulder->creator = new PublicCreator();
             if (!is_null($boulder->user)) {
                 $publicBoulder->creator->id = $boulder->user->id;
@@ -351,33 +423,5 @@ class BoulderService extends AbstractService
         return $response
             ->withStatus(200, 'OK')
             ->withHeader('Content-Type', 'application/json; charset=utf8');
-    }
-
-    /**
-     * Using the amount of special holds on each segment, compute the most important wall.
-     * This method uses knowledge of the specifics of the gym
-     *
-     * @param array $amounts
-     *
-     * @return int
-     */
-    private function computeMainWall(array $amounts): int
-    {
-        if (count($amounts) != 3) {
-            $mainIndex = 0;
-            $mainAmount = 0;
-            foreach ($amounts as $index => $amount) {
-                if ($amount > $mainAmount) {
-                    $mainIndex = $index;
-                    $mainAmount = $amount;
-                }
-            }
-            return $mainIndex;
-        }
-
-        if ($amounts[1] >= $amounts[0] && $amounts[1] >= $amounts[2])
-            return 1;
-
-        return $amounts[0] >= $amounts[2] ? 0 : 2;
     }
 }

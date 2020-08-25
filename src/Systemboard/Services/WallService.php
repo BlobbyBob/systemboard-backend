@@ -36,6 +36,10 @@ class WallService extends AbstractService
 {
     public function get(Request $request, Response $response, $args)
     {
+        if ($request->getAttribute('role') != 'user' && $request->getAttribute('role') != 'guest') {
+            return DefaultService::forbidden($request, $response);
+        }
+
         $id = (int) ($args['id'] ?? 0);
 
         if ($id <= 0)

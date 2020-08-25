@@ -40,11 +40,18 @@ class UserService extends AbstractService
 {
     public function getPrivate(Request $request, Response $response, $args)
     {
+        if ($request->getAttribute('role') != 'user') {
+            return DefaultService::forbidden($request, $response);
+        }
+
         $id = (int) ($args['id'] ?? 0);
 
         $user = User::load($this->pdo, $id);
         if (is_null($user)) {
             return DefaultService::notFound($request, $response);
+        }
+        if ($user->id != $request->getAttribute('user')->id) {
+            return DefaultService::forbidden($request, $response);
         }
 
         $responseObject = new PublicUserInfo();
@@ -62,6 +69,10 @@ class UserService extends AbstractService
 
     public function getPublic(Request $request, Response $response, $args)
     {
+        if ($request->getAttribute('role') != 'user' && $request->getAttribute('role') != 'guest') {
+            return DefaultService::forbidden($request, $response);
+        }
+
         $id = (int) ($args['id'] ?? 0);
         $wallid = (int) ($request->getQueryParams()['wall'] ?? 0);
 
@@ -85,6 +96,10 @@ class UserService extends AbstractService
 
     public function getRanking(Request $request, Response $response, $args)
     {
+        if ($request->getAttribute('role') != 'user' && $request->getAttribute('role') != 'guest') {
+            return DefaultService::forbidden($request, $response);
+        }
+
         $responseObject = [];
 
         $stmt = $this->pdo->prepare('SELECT * FROM ranking ORDER BY score DESC');
@@ -106,6 +121,10 @@ class UserService extends AbstractService
 
     public function put(Request $request, Response $response, $args)
     {
+        if ($request->getAttribute('role') != 'user') {
+            return DefaultService::forbidden($request, $response);
+        }
+
         $data = json_decode($request->getBody()->getContents());
         $schema = Schema::fromJsonString(file_get_contents('./schema/userPut.schema.json'));
         $validator = new Validator();
@@ -117,6 +136,10 @@ class UserService extends AbstractService
 
         $userid = (int) ($args['id'] ?? 0);
         $user = User::load($this->pdo, $userid);
+
+        if ($user->id != $request->getAttribute('user')->id) {
+            return DefaultService::forbidden($request, $response);
+        }
 
         if (isset($data->id)) {
             if ($user->id != $data->id) {

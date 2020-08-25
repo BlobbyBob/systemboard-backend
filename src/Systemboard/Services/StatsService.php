@@ -34,6 +34,10 @@ class StatsService extends AbstractService
 {
     public function get(Request $request, Response $response, $args)
     {
+        if ($request->getAttribute('role') != 'user' && $request->getAttribute('role') != 'guest') {
+            return DefaultService::forbidden($request, $response);
+        }
+
         $stats = new PublicSystemStats();
         $stats->version = 'Systemboard v4.0.0-202004232005'; // todo adjust on release
         $stats->changelog = self::getChangeLog();
@@ -73,8 +77,9 @@ class StatsService extends AbstractService
                 'date' => '16.12.2019', // todo adjust on release
                 'description' => 'Corona Relaunch',
                 'changes' => [
-                    '+ Vollständig überarbeites Frontend',
-                    '* Komplette Neuentwicklung des Systems'
+                    '+ Gastanmeldung',
+                    '* Vollständig überarbeitete Oberfläche',
+                    '* Vollständig überabeitetes Backend'
                 ]
             ],
             [

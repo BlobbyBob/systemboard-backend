@@ -36,6 +36,10 @@ class AccountService extends AbstractService
 {
     public function login(Request $request, Response $response, $args)
     {
+        if ($request->getAttribute('role') != 'login') {
+            return DefaultService::forbidden($request, $response);
+        }
+
         $email = (string) ($args['email'] ?? '');
         $authtype = (string) ($args['authtype'] ?? 'password');
         $auth = (string) ($request->getQueryParams()['auth'] ?? '');
@@ -49,7 +53,7 @@ class AccountService extends AbstractService
         $token = new TokenPublic();
         if ($authtype == 'password') {
             $user = User::loadByEmail($this->pdo, $email);
-            if (is_null($user)) {
+            if (is_null($user) || $user->status == 0) {
                 return DefaultService::notFound($request, $response);
             }
 
@@ -101,7 +105,11 @@ class AccountService extends AbstractService
         }
 
         $password = password_hash($data->password, PASSWORD_ARGON2I, ARGON_SETTINGS);
-        $activation = bin2hex(random_bytes(30)); // todo error handling
+        try {
+            $activation = bin2hex(random_bytes(30));
+        } catch (Exception $exception) {
+            return DefaultService::internalServerError($request, $response);
+        }
         $user = User::new($this->pdo, $data->email, $password, $data->name, 0, $activation, 0);
         if (is_null($user)) {
             return DefaultService::badRequest($request, $response);
@@ -167,7 +175,11 @@ CONTENT;
             return DefaultService::badRequest($request, $response);
         }
 
-        $user->forgotpw = bin2hex(random_bytes(50)); // todo error handling
+        try {
+            $user->forgotpw = bin2hex(random_bytes(50)); // todo error handling
+        } catch (Exception $exception) {
+            return DefaultService::internalServerError($request, $response);
+        }
         $user->save($this->pdo);
 
         $forgotLink = BASE_URL . '/?forgotPw=' . $user->forgotpw;
@@ -237,6 +249,10 @@ MAIL;
 
     public function logout(Request $request, Response $response, $args)
     {
+        if ($request->getAttribute('role') != 'user') {
+            return DefaultService::forbidden($request, $response);
+        }
+
         $sessionId = $request->getAttribute('sessionId');
         if (!$sessionId) {
             return DefaultService::badRequest($request, $response);
