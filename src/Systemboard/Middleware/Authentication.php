@@ -37,7 +37,7 @@ use Systemboard\Services\DefaultService;
 
 class Authentication implements MiddlewareInterface
 {
-    private PDO $pdo;
+    private $pdo;
 
     /**
      * Authentication constructor.

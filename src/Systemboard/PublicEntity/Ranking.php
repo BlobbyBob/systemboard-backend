@@ -26,8 +26,20 @@ namespace Systemboard\PublicEntity;
 
 class Ranking
 {
-    public int $id;
-    public string $name;
-    public ?string $badge;
-    public float $score;
+    /**
+     * @var int
+     */
+    public $id;
+    /**
+     * @var string
+     */
+    public $name;
+    /**
+     * @var string|null
+     */
+    public $badge;
+    /**
+     * @var float
+     */
+    public $score;
 }

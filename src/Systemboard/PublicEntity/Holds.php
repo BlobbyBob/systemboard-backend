@@ -26,6 +26,12 @@ namespace Systemboard\PublicEntity;
 
 class Holds
 {
-    public string $filename;
-    public array $holds;
+    /**
+     * @var string
+     */
+    public $filename;
+    /**
+     * @var array
+     */
+    public $holds;
 }

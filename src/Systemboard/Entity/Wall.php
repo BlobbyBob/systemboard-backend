@@ -28,8 +28,14 @@ use PDO;
 
 class Wall extends AbstractEntity
 {
-    public int $id;
-    public string $name;
+    /**
+     * @var int
+     */
+    public $id;
+    /**
+     * @var string
+     */
+    public $name;
 
     private function __construct(int $id, ?string $name = null)
     {

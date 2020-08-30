@@ -26,9 +26,18 @@ namespace Systemboard\PublicEntity;
 
 class ChangeLogEntry
 {
-    public string $version;
-    public string $date;
-    public string $description;
+    /**
+     * @var string
+     */
+    public $version;
+    /**
+     * @var string
+     */
+    public $date;
+    /**
+     * @var string
+     */
+    public $description;
     /** @var string[] */
-    public array $changes;
+    public $changes;
 }

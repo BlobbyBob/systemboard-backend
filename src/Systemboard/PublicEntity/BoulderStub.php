@@ -26,7 +26,16 @@ namespace Systemboard\PublicEntity;
 
 class BoulderStub
 {
-    public int $id;
-    public string $name;
-    public int $wall;
+    /**
+     * @var int
+     */
+    public $id;
+    /**
+     * @var string
+     */
+    public $name;
+    /**
+     * @var int
+     */
+    public $wall;
 }

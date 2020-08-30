@@ -26,5 +26,8 @@ namespace Systemboard\PublicEntity;
 
 class Token
 {
-    public string $token;
+    /**
+     * @var string
+     */
+    public $token;
 }

@@ -26,8 +26,20 @@ namespace Systemboard\PublicEntity;
 
 class UserProfile
 {
-    public int $id;
-    public string $name;
-    public UserStats $current;
-    public UserStats $total;
+    /**
+     * @var int
+     */
+    public $id;
+    /**
+     * @var string
+     */
+    public $name;
+    /**
+     * @var UserStats
+     */
+    public $current;
+    /**
+     * @var UserStats
+     */
+    public $total;
 }

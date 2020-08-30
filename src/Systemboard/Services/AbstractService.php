@@ -28,7 +28,7 @@ use PDO;
 
 class AbstractService
 {
-    protected PDO $pdo;
+    protected $pdo;
 
     public function __construct(PDO $pdo)
     {

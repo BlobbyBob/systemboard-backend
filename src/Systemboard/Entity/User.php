@@ -29,15 +29,42 @@ use Systemboard\Data\UserStats;
 
 class User extends AbstractEntity
 {
-    public int $id;
-    public string $email;
-    public string $password;
-    public string $name;
-    public int $status;
-    public ?string $activation;
-    public int $newsletter;
-    public ?string $forgotpw;
-    public ?string $badge;
+    /**
+     * @var int
+     */
+    public $id;
+    /**
+     * @var string
+     */
+    public $email;
+    /**
+     * @var string
+     */
+    public $password;
+    /**
+     * @var string
+     */
+    public $name;
+    /**
+     * @var int
+     */
+    public $status;
+    /**
+     * @var string|null
+     */
+    public $activation;
+    /**
+     * @var int
+     */
+    public $newsletter;
+    /**
+     * @var string|null
+     */
+    public $forgotpw;
+    /**
+     * @var string|null
+     */
+    public $badge;
 
 
     /**

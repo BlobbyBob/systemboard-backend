@@ -28,14 +28,32 @@ use PDO;
 
 class Boulder extends AbstractEntity
 {
-    public int $id;
-    public string $name;
-    public ?User $user;
-    public ?string $description;
+    /**
+     * @var int
+     */
+    public $id;
+    /**
+     * @var string
+     */
+    public $name;
+    /**
+     * @var User|null
+     */
+    public $user;
+    /**
+     * @var string|null
+     */
+    public $description;
     public $date;
 
-    private ?float $cachedGrade;
-    private ?float $cachedRating;
+    /**
+     * @var float|null
+     */
+    private $cachedGrade;
+    /**
+     * @var float|null
+     */
+    private $cachedRating;
 
     /**
      * Boulder constructor.
@@ -55,16 +73,6 @@ class Boulder extends AbstractEntity
         $this->date = $date;
 
         $this->resolved = !is_null($name);
-    }
-
-    public static function load(PDO $pdo, int $id): ?Boulder
-    {
-        $stmt = $pdo->prepare('SELECT id, name, user, description, date FROM boulder_meta WHERE id = ?');
-        if ($stmt->execute([$id]) && ($row = $stmt->fetch(PDO::FETCH_NUM)) !== false) {
-            [$id, $name, $user, $description, $date] = $row;
-            return new Boulder($id, $name, User::unresolved($user), $description, $date);
-        }
-        return null;
     }
 
     public static function unresolved(int $id): Boulder
@@ -92,6 +100,16 @@ class Boulder extends AbstractEntity
         return null;
     }
 
+    public static function load(PDO $pdo, int $id): ?Boulder
+    {
+        $stmt = $pdo->prepare('SELECT id, name, user, description, date FROM boulder_meta WHERE id = ?');
+        if ($stmt->execute([$id]) && ($row = $stmt->fetch(PDO::FETCH_NUM)) !== false) {
+            [$id, $name, $user, $description, $date] = $row;
+            return new Boulder($id, $name, User::unresolved($user), $description, $date);
+        }
+        return null;
+    }
+
     /**
      * @param PDO      $pdo
      * @param array    $constraints
@@ -100,7 +118,7 @@ class Boulder extends AbstractEntity
      *
      * @return Boulder[]
      */
-    public static function search(PDO $pdo, array $constraints, int $userId = null,  int $limit = 3): array
+    public static function search(PDO $pdo, array $constraints, int $userId = null, int $limit = 3): array
     {
         // Preprocess constraints for sql's LIKE
         $constraints[1] = '%' . str_replace('%', '%%', $constraints[1]) . '%';

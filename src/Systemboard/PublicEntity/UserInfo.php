@@ -26,8 +26,20 @@ namespace Systemboard\PublicEntity;
 
 class UserInfo
 {
-    public int $id;
-    public string $name;
-    public string $email;
-    public bool $newsletter;
+    /**
+     * @var int
+     */
+    public $id;
+    /**
+     * @var string
+     */
+    public $name;
+    /**
+     * @var string
+     */
+    public $email;
+    /**
+     * @var bool
+     */
+    public $newsletter;
 }

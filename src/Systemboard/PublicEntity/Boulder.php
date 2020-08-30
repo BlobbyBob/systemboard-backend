@@ -26,14 +26,44 @@ namespace Systemboard\PublicEntity;
 
 class Boulder
 {
-    public int $id;
-    public string $name;
-    public ?string $description;
-    public Creator $creator;
-    public int $ascents;
-    public bool $climbed;
-    public ?float $grade;
-    public ?float $rating;
-    public Location $location;
-    public array $holds;
+    /**
+     * @var int
+     */
+    public $id;
+    /**
+     * @var string
+     */
+    public $name;
+    /**
+     * @var string|null
+     */
+    public $description;
+    /**
+     * @var Creator
+     */
+    public $creator;
+    /**
+     * @var int
+     */
+    public $ascents;
+    /**
+     * @var bool
+     */
+    public $climbed;
+    /**
+     * @var float|null
+     */
+    public $grade;
+    /**
+     * @var float|null
+     */
+    public $rating;
+    /**
+     * @var Location
+     */
+    public $location;
+    /**
+     * @var array
+     */
+    public $holds;
 }

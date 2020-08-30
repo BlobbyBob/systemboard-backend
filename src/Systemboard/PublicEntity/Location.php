@@ -26,7 +26,16 @@ namespace Systemboard\PublicEntity;
 
 class Location
 {
-    public int $min;
-    public int $main;
-    public int $max;
+    /**
+     * @var int
+     */
+    public $min;
+    /**
+     * @var int
+     */
+    public $main;
+    /**
+     * @var int
+     */
+    public $max;
 }

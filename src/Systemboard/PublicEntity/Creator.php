@@ -26,6 +26,12 @@ namespace Systemboard\PublicEntity;
 
 class Creator
 {
-    public int $id;
-    public string $name;
+    /**
+     * @var int
+     */
+    public $id;
+    /**
+     * @var string
+     */
+    public $name;
 }

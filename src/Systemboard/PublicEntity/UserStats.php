@@ -29,8 +29,14 @@ use Systemboard\Entity\User;
 
 class UserStats
 {
-    public int $userid;
-    public int $points;
+    /**
+     * @var int
+     */
+    public $userid;
+    /**
+     * @var int
+     */
+    public $points;
     /** @var BoulderStub[] */
-    public array $ascents;
+    public $ascents;
 }

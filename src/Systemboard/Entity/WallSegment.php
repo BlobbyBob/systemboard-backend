@@ -28,9 +28,18 @@ use PDO;
 
 class WallSegment extends AbstractEntity
 {
-    public int $id;
-    public ?Wall $wall;
-    public string $filename;
+    /**
+     * @var int
+     */
+    public $id;
+    /**
+     * @var Wall|null
+     */
+    public $wall;
+    /**
+     * @var string
+     */
+    public $filename;
 
     private function __construct(int $id, ?Wall $wall = null, ?string $filename = null)
     {

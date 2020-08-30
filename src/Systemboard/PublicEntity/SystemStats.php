@@ -26,10 +26,22 @@ namespace Systemboard\PublicEntity;
 
 class SystemStats
 {
-    public string $version;
+    /**
+     * @var string
+     */
+    public $version;
     /** @var ChangeLogEntry[] */
-    public array $changelog;
-    public int $boulder;
-    public int $holds;
-    public int $users;
+    public $changelog;
+    /**
+     * @var int
+     */
+    public $boulder;
+    /**
+     * @var int
+     */
+    public $holds;
+    /**
+     * @var int
+     */
+    public $users;
 }

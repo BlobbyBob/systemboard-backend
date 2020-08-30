@@ -28,10 +28,22 @@ use PDO;
 
 class Hold extends AbstractEntity
 {
-    public int $id;
-    public ?WallSegment $wallSegment;
-    public string $tag;
-    public string $attr;
+    /**
+     * @var int
+     */
+    public $id;
+    /**
+     * @var WallSegment|null
+     */
+    public $wallSegment;
+    /**
+     * @var string
+     */
+    public $tag;
+    /**
+     * @var string
+     */
+    public $attr;
 
 
     /**

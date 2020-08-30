@@ -26,7 +26,16 @@ namespace Systemboard\PublicEntity;
 
 class Hold
 {
-    public int $id;
-    public string $tag;
-    public string $attr;
+    /**
+     * @var int
+     */
+    public $id;
+    /**
+     * @var string
+     */
+    public $tag;
+    /**
+     * @var string
+     */
+    public $attr;
 }

@@ -26,7 +26,16 @@ namespace Systemboard\PublicEntity;
 
 class Wall
 {
-    public int $id;
-    public string $name;
-    public array $wallSegments;
+    /**
+     * @var int
+     */
+    public $id;
+    /**
+     * @var string
+     */
+    public $name;
+    /**
+     * @var array
+     */
+    public $wallSegments;
 }

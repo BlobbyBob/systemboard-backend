@@ -40,12 +40,12 @@ $services->set('database', function () {
     return $pdo;
 });
 
-$services->set('accountService', fn() => new AccountService($services->get('database')));
-$services->set('boulderService', fn() => new BoulderService($services->get('database')));
-$services->set('holdService', fn() => new HoldService($services->get('database')));
-$services->set('loginService', fn() => new AccountService($services->get('database')));
-$services->set('statsService', fn() => new StatsService($services->get('database')));
-$services->set('userService', fn() => new UserService($services->get('database')));
-$services->set('wallService', fn() => new WallService($services->get('database')));
+$services->set('accountService', new AccountService($services->get('database')));
+$services->set('boulderService', new BoulderService($services->get('database')));
+$services->set('holdService', new HoldService($services->get('database')));
+$services->set('loginService', new AccountService($services->get('database')));
+$services->set('statsService', new StatsService($services->get('database')));
+$services->set('userService', new UserService($services->get('database')));
+$services->set('wallService', new WallService($services->get('database')));
 
 return $services;

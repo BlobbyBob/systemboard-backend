@@ -26,7 +26,10 @@ namespace Systemboard\Entity;
 
 class AbstractEntity
 {
-    protected bool $resolved;
+    /**
+     * @var bool
+     */
+    protected $resolved;
 
     public function isResolved(): bool
     {
