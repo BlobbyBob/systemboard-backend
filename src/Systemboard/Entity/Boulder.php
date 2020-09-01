@@ -113,21 +113,25 @@ class Boulder extends AbstractEntity
     /**
      * @param PDO      $pdo
      * @param array    $constraints
-     * @param int|null $userId
      * @param int      $limit
      *
      * @return Boulder[]
      */
-    public static function search(PDO $pdo, array $constraints, int $userId = null, int $limit = 3): array
+    public static function search(PDO $pdo, array $constraints, int $limit = 18): array
     {
         // Preprocess constraints for sql's LIKE
         $constraints[1] = '%' . str_replace('%', '%%', $constraints[1]) . '%';
         $constraints[3] = '%' . str_replace('%', '%%', $constraints[3]) . '%';
 
-        // Append limit
-        $constraints[] = $limit;
-
         $boulder = [];
+
+        $stmt = $pdo->prepare('SELECT MAX(id) FROM wall');
+        $stmt->execute();
+        $wallId = $stmt->fetchColumn();
+
+        // Append wall id and limit
+        $constraints[] = $wallId;
+        $constraints[] = $limit;
 
         $stmt = $pdo->prepare('SELECT bm.id, bm.name, bm.user, u.name, bm.description, bm.date, gv.grade, rv.stars FROM boulder_meta bm 
             LEFT JOIN user u on bm.user = u.id 
@@ -140,7 +144,8 @@ class Boulder extends AbstractEntity
             (? OR gv.grade <= ?) AND
             (? OR rv.stars >= ?) AND
             (? OR rv.stars <= ?) AND
-            (? OR NOT EXISTS(SELECT * FROM climbed c WHERE c.user = u.id AND c.boulder = bm.id))
+            (? OR NOT EXISTS(SELECT * FROM climbed c WHERE c.user = ? AND c.boulder = bm.id)) AND
+            EXISTS (SELECT b.boulderid FROM boulder b JOIN hold h ON b.holdid = h.id JOIN wall_segment ws ON h.wall_segment = ws.id WHERE b.boulderid = bm.id AND ws.wall = ?)
             ORDER BY bm.id DESC
             LIMIT ?');
         if ($stmt->execute($constraints)) {

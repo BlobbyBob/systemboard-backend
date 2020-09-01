@@ -391,15 +391,15 @@ class BoulderService extends AbstractService
         $constraints[] = $data->maxRating ?? 5;
 
         if ($request->getAttribute('role') == 'guest') {
-            $constraints[] = false;
-            $constraints[] = false;
+            $constraints[] = true;
+            $constraints[] = 0;
         } else {
             $constraints[] = empty($data->notDoneYet);
-            $constraints[] = $data->notDoneYet ?? false;
+            $constraints[] = $request->getAttribute('user')->id;
         }
 
 
-        // todo implement order, climbed & page
+        // todo implement order, climbed & pagination
 
         $responseArray = [];
         foreach (Boulder::search($this->pdo, $constraints) as $boulder) {
