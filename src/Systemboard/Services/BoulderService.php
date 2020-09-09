@@ -69,7 +69,7 @@ class BoulderService extends AbstractService
         $responseObject->name = $boulder->name;
         $responseObject->description = $boulder->description;
         $responseObject->ascents = $boulder->fetchAscents($this->pdo);
-        $responseObject->climbed = rand(0, 1) ? true : false; // todo replace, when authentication is implemented
+        $responseObject->climbed = $request->getAttribute('role') == 'guest' ? false : $boulder->climbedBy($this->pdo, $request->getAttribute('user'));
         $responseObject->creator = new PublicCreator();
         if (!is_null($boulder->user)) {
             $boulder->user->resolve($this->pdo);
@@ -307,9 +307,11 @@ class BoulderService extends AbstractService
             return DefaultService::badRequest($request, $response);
         }
 
-        $stmt = $this->pdo->prepare('INSERT IGNORE INTO rating (boulder, user, stars) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE stars = ?');
-        if (!$stmt->execute([$boulder->id, $user->id, $data->rating, $data->rating])) {
-            return DefaultService::internalServerError($request, $response);
+        if (isset($data->rating)) {
+            $stmt = $this->pdo->prepare('INSERT IGNORE INTO rating (boulder, user, stars) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE stars = ?');
+            if (!$stmt->execute([$boulder->id, $user->id, $data->rating, $data->rating])) {
+                return DefaultService::internalServerError($request, $response);
+            }
         }
 
         if (isset($data->grade)) {

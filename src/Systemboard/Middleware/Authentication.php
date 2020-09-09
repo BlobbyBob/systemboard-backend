@@ -51,7 +51,7 @@ class Authentication implements MiddlewareInterface
 
     public function process(Request $request, RequestHandler $handler): ResponseInterface
     {
-        $response = new Response(200, new Headers(["Access-Control-Allow-Origin" => "*", "Access-Control-Allow-Method" => "*", "Access-Control-Allow-Headers" => "*"]));
+        $response = new Response(200, new Headers(["Access-Control-Allow-Origin" => "*", "Access-Control-Allow-Methods" => "*", "Access-Control-Allow-Headers" => "*"]));
 
         if (strtoupper($request->getMethod()) == 'OPTIONS') {
             return $response;
@@ -100,6 +100,6 @@ class Authentication implements MiddlewareInterface
             return $response->withStatus(401, 'Unauthorized');
         }
 
-        return $handler->handle($request)->withHeader("Access-Control-Allow-Origin", "*")->withHeader("Access-Control-Allow-Method", "*")->withHeader("Access-Control-Allow-Header", "*");
+        return $handler->handle($request)->withHeader("Access-Control-Allow-Origin", "*")->withHeader("Access-Control-Allow-Methods", "*")->withHeader("Access-Control-Allow-Header", "*");
     }
 }

@@ -3,9 +3,7 @@
   "type": "object",
   "default": {},
   "additionalProperties": true,
-  "required": [
-    "rating"
-  ],
+  "required": [],
   "properties": {
     "rating": {
       "$id": "#/properties/rating",
