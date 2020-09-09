@@ -57,6 +57,7 @@ $app->post('/pwreset', $postPwResetHandler);
 $app->post('/misuse', $postPwResetMisuseHandler);
 
 $app->put('/user/{id}', $putUserHandler);
+$app->put('/boulderoftheday/climbed', $putBoulderOfTheDayHandler);
 $app->put('/boulder/{id}', $putBoulderHandler);
 $app->put('/boulder/{id}/climbed', $putBoulderClimbedHandler);
 $app->put('/boulder/{id}/vote', $putBoulderVoteHandler);

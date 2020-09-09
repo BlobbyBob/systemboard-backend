@@ -282,6 +282,54 @@ class BoulderService extends AbstractService
             ->withHeader('Content-Type', 'application/json; charset=utf8');
     }
 
+    public function putBoulderOfTheDay(Request $request, Response $response, $args)
+    {
+        if ($request->getAttribute('role') != 'user') {
+            return DefaultService::forbidden($request, $response);
+        }
+
+        $id = (int) ($args['id'] ?? 0);
+
+        $data = json_decode($request->getBody()->getContents());
+        $schema = Schema::fromJsonString(file_get_contents('./schema/climbedPut.schema.json'));
+        $validator = new Validator();
+        $result = $validator->schemaValidation($data, $schema);
+
+        if (!$result->isValid()) {
+            return DefaultService::badRequest($request, $response);
+        }
+
+        $user = $request->getAttribute('user');
+
+        if ($data->climbed) {
+            $stmt = $this->pdo->prepare('SELECT COUNT(*) FROM climbed_botd WHERE user = ? AND botd = (SELECT id FROM boulder_of_the_day WHERE date = CURRENT_DATE)');
+            if (!$stmt->execute([$user->id])) {
+                return DefaultService::internalServerError($request, $response);
+            }
+            if ($stmt->fetchColumn() == 0) {
+                $stmt = $this->pdo->prepare('INSERT INTO climbed_botd (botd, user) VALUE ((SELECT id FROM boulder_of_the_day WHERE date = CURRENT_DATE), ?)');
+                if (!$stmt->execute([$user->id])) {
+                    return DefaultService::internalServerError($request, $response);
+                }
+            }
+        } else {
+            $stmt = $this->pdo->prepare('SELECT COUNT(*) FROM climbed_botd WHERE user = ? AND botd = (SELECT id FROM boulder_of_the_day WHERE date = CURRENT_DATE)');
+            if (!$stmt->execute([$user->id])) {
+                return DefaultService::internalServerError($request, $response);
+            }
+            if ($stmt->fetchColumn() > 0) {
+                $stmt = $this->pdo->prepare('DELETE FROM climbed_botd WHERE botd = (SELECT id FROM boulder_of_the_day WHERE date = CURRENT_DATE) AND user = ?');
+                if (!$stmt->execute([$user->id])) {
+                    return DefaultService::internalServerError($request, $response);
+                }
+            }
+        }
+
+        return $response
+            ->withStatus(204, 'No Content')
+            ->withHeader('Content-Type', 'application/json; charset=utf8');
+    }
+
     public function putVote(Request $request, Response $response, $args)
     {
         if ($request->getAttribute('role') != 'user') {

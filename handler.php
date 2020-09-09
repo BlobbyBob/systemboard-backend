@@ -220,6 +220,17 @@ $putBoulderVoteHandler = function (Request $request, Response $response, $args) 
     return DefaultService::notImplemented($request, $response);
 };
 
+$putBoulderOfTheDayHandler = function (Request $request, Response $response, $args) {
+
+    if ($this->has('boulderService')) {
+        /** @var BoulderService $boulderService */
+        $boulderService = $this->get('boulderService');
+        return $boulderService->putBoulderOfTheDay($request, $response, $args);
+    }
+
+    return DefaultService::notImplemented($request, $response);
+};
+
 $deleteBoulderHandler = function (Request $request, Response $response, $args) {
 
 
