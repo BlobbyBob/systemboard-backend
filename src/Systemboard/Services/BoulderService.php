@@ -149,6 +149,8 @@ class BoulderService extends AbstractService
             return DefaultService::badRequest($request, $response);
         }
 
+        $user = $request->getAttribute('user');
+
         $holds = [];
         foreach ($data->holds as $hold) {
             $holds[] = [$hold->id, $hold->type];
@@ -158,7 +160,20 @@ class BoulderService extends AbstractService
             return DefaultService::badRequest($request, $response);
         }
 
-        $response->getBody()->write(json_encode($boulder)); // todo convert to public boulder before outputting
+        $stmt = $this->pdo->prepare('INSERT IGNORE INTO rating (boulder, user, stars) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE stars = ?');
+        if (!$stmt->execute([$boulder->id, $user->id, $data->rating, $data->rating])) {
+            return DefaultService::internalServerError($request, $response);
+        }
+
+        $stmt = $this->pdo->prepare('INSERT IGNORE INTO grade (boulder, user, grade) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE grade = ?');
+        if (!$stmt->execute([$boulder->id, $user->id, $data->grade, $data->grade])) {
+            return DefaultService::internalServerError($request, $response);
+        }
+
+        $responseObject = new PublicBoulder();
+        $responseObject->id = $boulder->id;
+
+        $response->getBody()->write(json_encode($responseObject));
         return $response
             ->withStatus(200, 'OK')
             ->withHeader('Content-Type', 'application/json; charset=utf8');
