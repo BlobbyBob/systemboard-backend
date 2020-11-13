@@ -66,4 +66,8 @@ class Boulder
      * @var array
      */
     public $holds;
+    /**
+     * @var bool
+     */
+    public $deletable;
 }

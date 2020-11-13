@@ -78,6 +78,7 @@ class BoulderService extends AbstractService
         }
         $responseObject->grade = $boulder->getGrade($this->pdo);
         $responseObject->rating = $boulder->getRating($this->pdo);
+        $responseObject->deletable = $request->getAttribute('role') == 'guest' ? false : $boulder->user->id == $request->getAttribute('user')->id;
         $responseObject->location = new PublicLocation();
         $responseObject->holds = [];
         $min = SEGMENTS_PER_WALL - 1;
