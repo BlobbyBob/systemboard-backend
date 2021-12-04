@@ -92,10 +92,10 @@ class BoulderService extends AbstractService
             $responseObject->holds[$hold->id] = $type;
 
             if ($type == 2) {
-                $main[$hold->wallSegment->id % SEGMENTS_PER_WALL]++;
+                $main[($hold->wallSegment->id - 1) % SEGMENTS_PER_WALL]++;
             }
-            $min = min($min, $hold->wallSegment->id % SEGMENTS_PER_WALL);
-            $max = max($max, $hold->wallSegment->id % SEGMENTS_PER_WALL);
+            $min = min($min, ($hold->wallSegment->id - 1) % SEGMENTS_PER_WALL);
+            $max = max($max, ($hold->wallSegment->id - 1) % SEGMENTS_PER_WALL);
         }
         $responseObject->location->min = $min;
         $responseObject->location->max = $max;

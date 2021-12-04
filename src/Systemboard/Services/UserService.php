@@ -109,6 +109,7 @@ class UserService extends AbstractService
         while (($row = $stmt->fetch(PDO::FETCH_NUM)) !== false) {
             $ranking = new PublicRanking();
             [$ranking->id, $ranking->name, $ranking->badge, $ranking->score] = $row;
+            $ranking->score = (float) $ranking->score;
             $responseObject[] = $ranking;
         }
 
