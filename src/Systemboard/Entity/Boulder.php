@@ -58,11 +58,11 @@ class Boulder extends AbstractEntity
     /**
      * Boulder constructor.
      *
-     * @param int         $id
+     * @param int $id
      * @param string|null $name
-     * @param User|null   $user
+     * @param User|null $user
      * @param string|null $description
-     * @param null        $date
+     * @param null $date
      */
     private function __construct(int $id, string $name = null, ?User $user = null, ?string $description = null, $date = null)
     {
@@ -85,7 +85,7 @@ class Boulder extends AbstractEntity
         $pdo->beginTransaction();
         $stmt = $pdo->prepare('INSERT INTO boulder_meta (name, user, description) VALUES (?, ?, ?)');
         if ($stmt->execute([$name, $user->id, $description])) {
-            $id = (int) $pdo->lastInsertId();
+            $id = (int)$pdo->lastInsertId();
             $stmt = $pdo->prepare('INSERT INTO boulder (boulderid, holdid, type) VALUES (?, ?, ?)');
             foreach ($holds as [$holdid, $type]) {
                 if (!$stmt->execute([$id, $holdid, $type])) {
@@ -111,13 +111,13 @@ class Boulder extends AbstractEntity
     }
 
     /**
-     * @param PDO   $pdo
+     * @param PDO $pdo
      * @param array $constraints
-     * @param int   $limit
+     * @param int $limit
      *
      * @return Boulder[]
      */
-    public static function search(PDO $pdo, array $constraints, int $limit = 18): array
+    public static function search(PDO $pdo, array $constraints, int $page = 1, int $items = 18, int &$pages = null): array
     {
         // Preprocess constraints for sql's LIKE
         $constraints[1] = '%' . str_replace('%', '%%', $constraints[1]) . '%';
@@ -129,9 +129,32 @@ class Boulder extends AbstractEntity
         $stmt->execute();
         $wallId = $stmt->fetchColumn();
 
-        // Append wall id and limit
         $constraints[] = $wallId;
-        $constraints[] = $limit;
+
+        if (!is_null($pages)) {
+            $stmt = $pdo->prepare('SELECT COUNT(*) FROM (SELECT DISTINCT bm.id FROM boulder_meta bm 
+            LEFT JOIN user u ON bm.user = u.id 
+            LEFT JOIN grade_view gv ON bm.id = gv.boulder
+            LEFT JOIN rating_view rv ON bm.id = rv.boulder 
+            LEFT JOIN boulder b ON b.boulderid = bm.id LEFT JOIN hold h ON b.holdid = h.id LEFT JOIN wall_segment ws ON h.wall_segment = ws.id WHERE
+            (? OR bm.name LIKE ?) AND
+            (? OR u.name LIKE ?) AND
+            (? OR bm.user = ?) AND
+            (? OR gv.grade >= ?) AND
+            (? OR gv.grade <= ?) AND
+            (? OR rv.stars >= ?) AND
+            (? OR rv.stars <= ?) AND
+            (? OR NOT EXISTS(SELECT * FROM climbed c WHERE c.user = ? AND c.boulder = bm.id)) AND
+            ws.wall = ?
+            ORDER BY bm.id DESC) t');
+
+            $stmt->execute($constraints);
+            $count = $stmt->fetchColumn();
+            $pages = ceil(($count ?? 0) / $items);
+        }
+
+        $constraints[] = ($page - 1) * $items;
+        $constraints[] = $items;
 
         $stmt = $pdo->prepare('SELECT DISTINCT bm.id, bm.name, bm.user, u.name, bm.description, bm.date, gv.grade, rv.stars FROM boulder_meta bm 
             LEFT JOIN user u ON bm.user = u.id 
@@ -148,15 +171,16 @@ class Boulder extends AbstractEntity
             (? OR NOT EXISTS(SELECT * FROM climbed c WHERE c.user = ? AND c.boulder = bm.id)) AND
             ws.wall = ?
             ORDER BY bm.id DESC
-            LIMIT ?');
+            LIMIT ?, ?');
+
         if ($stmt->execute($constraints)) {
             while (($row = $stmt->fetch(PDO::FETCH_NUM)) !== false) {
                 [$id, $name, $userid, $username, $description, $date, $grade, $rating] = $row;
                 $user = User::unresolved($userid);
                 $user->name = $username;
                 $b = new Boulder($id, $name, $user, $description, $date);
-                $b->cachedGrade = (float) $grade;
-                $b->cachedRating = (float) $rating;
+                $b->cachedGrade = (float)$grade;
+                $b->cachedRating = (float)$rating;
                 $boulder[] = $b;
             }
         }
@@ -265,7 +289,7 @@ class Boulder extends AbstractEntity
         $stmt = $pdo->prepare('SELECT stars FROM rating_view WHERE boulder = ?');
         if ($stmt->execute([$this->id]) && ($row = $stmt->fetch(PDO::FETCH_NUM)) !== false) {
             [$stars] = $row;
-            return (float) $stars;
+            return (float)$stars;
         }
         return null;
     }
@@ -277,7 +301,7 @@ class Boulder extends AbstractEntity
         $stmt = $pdo->prepare('SELECT grade FROM grade_view WHERE boulder = ?');
         if ($stmt->execute([$this->id]) && ($row = $stmt->fetch(PDO::FETCH_NUM)) !== false) {
             [$grade] = $row;
-            return (float) $grade;
+            return (float)$grade;
         }
         return null;
     }

@@ -34,6 +34,7 @@ use Systemboard\Entity\User;
 use Systemboard\PublicEntity\Boulder as PublicBoulder;
 use Systemboard\PublicEntity\Creator as PublicCreator;
 use Systemboard\PublicEntity\Location as PublicLocation;
+use Systemboard\PublicEntity\SearchResults;
 
 class BoulderService extends AbstractService
 {
@@ -464,11 +465,13 @@ class BoulderService extends AbstractService
             $constraints[] = $request->getAttribute('user')->id;
         }
 
-
+        $items = $data->items ?? 18;
+        $page = $data->page ?? 1;
         // todo implement order, climbed & pagination
 
-        $responseArray = [];
-        foreach (Boulder::search($this->pdo, $constraints) as $boulder) {
+        $responseObj = new SearchResults();
+        $responseObj->results = [];
+        foreach (Boulder::search($this->pdo, $constraints, $page, $items, $responseObj->pages) as $boulder) {
             $publicBoulder = new PublicBoulder();
             $publicBoulder->id = $boulder->id;
             $publicBoulder->name = $boulder->name;
@@ -482,10 +485,10 @@ class BoulderService extends AbstractService
             }
             $publicBoulder->grade = $boulder->getGrade($this->pdo, true);
             $publicBoulder->rating = $boulder->getRating($this->pdo, true);
-            $responseArray[] = $publicBoulder;
+            $responseObj->results[] = $publicBoulder;
         }
 
-        $response->getBody()->write(json_encode($responseArray));
+        $response->getBody()->write(json_encode($responseObj));
         return $response
             ->withStatus(200, 'OK')
             ->withHeader('Content-Type', 'application/json; charset=utf8');
