@@ -24,6 +24,7 @@ use Slim\Psr7\Request;
 use Slim\Psr7\Response;
 use Systemboard\Services\BoulderService;
 use Systemboard\Services\DefaultService;
+use Systemboard\Services\EditorService;
 use Systemboard\Services\HoldService;
 use Systemboard\Services\AccountService;
 use Systemboard\Services\StatsService;
@@ -46,7 +47,7 @@ $getHoldsHandler = function (Request $request, Response $response, $args) {
     if ($this->has('holdService')) {
         /** @var HoldService $holdService */
         $holdService = $this->get('holdService');
-        return $holdService->get($request, $response, $args);
+        return $holdService->getHolds($request, $response, $args);
     }
 
     return DefaultService::notImplemented($request, $response);
@@ -282,6 +283,50 @@ $getStatsHandler = function (Request $request, Response $response, $args) {
         /** @var StatsService $statsService */
         $statsService = $this->get('statsService');
         return $statsService->get($request, $response, $args);
+    }
+
+    return DefaultService::notImplemented($request, $response);
+};
+
+$getHoldHandler = function (Request $request, Response $response, $args) {
+
+    if ($this->has('editorService')) {
+        /** @var EditorService $editorService */
+        $editorService = $this->get('editorService');
+        return $editorService->getHold($request, $response, $args);
+    }
+
+    return DefaultService::notImplemented($request, $response);
+};
+
+$postHoldHandler = function (Request $request, Response $response, $args) {
+
+    if ($this->has('editorService')) {
+        /** @var EditorService $editorService */
+        $editorService = $this->get('editorService');
+        return $editorService->postHold($request, $response, $args);
+    }
+
+    return DefaultService::notImplemented($request, $response);
+};
+
+$putHoldHandler = function (Request $request, Response $response, $args) {
+
+    if ($this->has('editorService')) {
+        /** @var EditorService $editorService */
+        $editorService = $this->get('editorService');
+        return $editorService->putHold($request, $response, $args);
+    }
+
+    return DefaultService::notImplemented($request, $response);
+};
+
+$deleteHoldHandler = function (Request $request, Response $response, $args) {
+
+    if ($this->has('editorService')) {
+        /** @var EditorService $editorService */
+        $editorService = $this->get('editorService');
+        return $editorService->deleteHold($request, $response, $args);
     }
 
     return DefaultService::notImplemented($request, $response);

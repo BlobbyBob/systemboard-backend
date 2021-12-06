@@ -22,6 +22,7 @@ declare(strict_types=1);
 
 use DI\Container;
 use Systemboard\Services\BoulderService;
+use Systemboard\Services\EditorService;
 use Systemboard\Services\HoldService;
 use Systemboard\Services\AccountService;
 use Systemboard\Services\StatsService;
@@ -42,6 +43,7 @@ $services->set('database', function () {
 
 $services->set('accountService', new AccountService($services->get('database')));
 $services->set('boulderService', new BoulderService($services->get('database')));
+$services->set('editorService', new EditorService($services->get('database')));
 $services->set('holdService', new HoldService($services->get('database')));
 $services->set('loginService', new AccountService($services->get('database')));
 $services->set('statsService', new StatsService($services->get('database')));

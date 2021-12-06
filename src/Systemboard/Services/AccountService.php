@@ -44,7 +44,7 @@ class AccountService extends AbstractService
         $authtype = (string) ($args['authtype'] ?? 'password');
         $auth = (string) ($request->getQueryParams()['auth'] ?? '');
 
-        if (array_search($authtype, ['password']) === false) {
+        if (!in_array($authtype, ['password'])) {
             return DefaultService::notImplemented($request, $response);
         }
 
@@ -65,7 +65,7 @@ class AccountService extends AbstractService
                 }
                 // rehash
                 if ($hash = password_hash($auth, PASSWORD_ARGON2I, ARGON_SETTINGS)) {
-                    $user->password = (string) $hash;
+                    $user->password = $hash;
                     $user->save($this->pdo);
                 }
             } else {
@@ -75,7 +75,7 @@ class AccountService extends AbstractService
                 // rehash
                 if (password_needs_rehash($user->password, PASSWORD_ARGON2I, ARGON_SETTINGS)
                     && $hash = password_hash($auth, PASSWORD_ARGON2I, ARGON_SETTINGS)) {
-                    $user->password = (string) $hash;
+                    $user->password = $hash;
                     $user->save($this->pdo);
                 }
             }
@@ -91,6 +91,29 @@ class AccountService extends AbstractService
         return $response
             ->withStatus(200, 'OK')
             ->withHeader('Content-Type', 'application/json; charset=utf8');
+    }
+
+    private function gc()
+    {
+        $stmt = $this->pdo->prepare('DELETE FROM session WHERE expires < NOW()');
+        $stmt->execute([]);
+    }
+
+    private function createSession(User $user): string
+    {
+        $stmt = $this->pdo->prepare('INSERT INTO session (id, user, expires) VALUES (?, ?, ?)');
+        for ($i = 0; $i < 3; $i++) {
+            // Try at most 3 times
+            try {
+                $token = base64_encode(random_bytes(189));
+                if ($stmt->execute([$token, $user->id, date('Y-m-d H:i:s', time() + SESSION_DURATION)]) && $stmt->rowCount() > 0) {
+                    return $token;
+                }
+            } catch (Exception $e) {
+                // todo implement handling
+            }
+        }
+        return '';
     }
 
     public function register(Request $request, Response $response, $args)
@@ -159,7 +182,7 @@ CONTENT;
 
     public function pwReset(Request $request, Response $response, $args)
     {
-        $email = (string) ($args['email'] ?? '');
+        $email = (string)($args['email'] ?? '');
 
         $data = json_decode($request->getBody()->getContents());
         $schema = Schema::fromJsonString(file_get_contents('./schema/tokenPost.schema.json'));
@@ -224,7 +247,7 @@ MAIL;
 
     public function newPassword(Request $request, Response $response, $args)
     {
-        $token = (string) ($args['token'] ?? '');
+        $token = (string)($args['token'] ?? '');
 
         $data = json_decode($request->getBody()->getContents());
         $schema = Schema::fromJsonString(file_get_contents('./schema/passwordPut.schema.json'));
@@ -264,28 +287,5 @@ MAIL;
         } else {
             return DefaultService::internalServerError($request, $response);
         }
-    }
-
-    private function createSession(User $user): string
-    {
-        $stmt = $this->pdo->prepare('INSERT INTO session (id, user, expires) VALUES (?, ?, ?)');
-        for ($i = 0; $i < 3; $i++) {
-            // Try at most 3 times
-            try {
-                $token = base64_encode(random_bytes(189));
-                if ($stmt->execute([$token, $user->id, date('Y-m-d H:i:s', time() + SESSION_DURATION)]) && $stmt->rowCount() > 0) {
-                    return $token;
-                }
-            } catch (Exception $e) {
-                // todo implement handling
-            }
-        }
-        return '';
-    }
-
-    private function gc()
-    {
-        $stmt = $this->pdo->prepare('DELETE FROM session WHERE expires < NOW()');
-        $stmt->execute([]);
     }
 }

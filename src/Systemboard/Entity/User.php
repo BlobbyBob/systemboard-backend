@@ -25,7 +25,6 @@ namespace Systemboard\Entity;
 
 
 use PDO;
-use Systemboard\Data\UserStats;
 
 class User extends AbstractEntity
 {

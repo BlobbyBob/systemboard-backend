@@ -26,6 +26,7 @@ namespace Systemboard\Services;
 
 use Slim\Psr7\Request;
 use Slim\Psr7\Response;
+use Systemboard\Entity\User;
 use Systemboard\Entity\Wall;
 use Systemboard\Entity\WallSegment;
 use Systemboard\PublicEntity\Hold as PublicHold;
@@ -33,7 +34,7 @@ use Systemboard\PublicEntity\Holds as PublicHolds;
 
 class HoldService extends AbstractService
 {
-    public function get(Request $request, Response $response, $args)
+    public function getHolds(Request $request, Response $response, $args)
     {
         if ($request->getAttribute('role') != 'user' && $request->getAttribute('role') != 'guest') {
             return DefaultService::forbidden($request, $response);

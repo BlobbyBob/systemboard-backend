@@ -1,0 +1,31 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "type": "object",
+  "default": {},
+  "additionalProperties": true,
+  "required": [],
+  "properties": {
+    "tag": {
+      "$id": "#/properties/tag",
+      "type": "string",
+      "title": "tag",
+      "description": "HTML tag of the hold",
+      "pattern": "^[a-z]+$",
+      "maxLength": 20,
+      "examples": [
+        "ellipse"
+      ]
+    },
+    "attr": {
+      "$id": "#/properties/attr",
+      "type": "string",
+      "title": "attr",
+      "description": "Attributes of the HTML tag of the hold",
+      "pattern": "^(\\s*[a-z-]+=(('[^'\\\\]*')|([^\\s\\\\/>]+\\s)))+$",
+      "maxLength": 256,
+      "examples": [
+        "cx='251' cy='428' rx='33.36836573830793' ry='29.427450980392166'"
+      ]
+    }
+  }
+}

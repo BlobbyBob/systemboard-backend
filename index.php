@@ -34,7 +34,7 @@ $app = AppFactory::create();
 
 $app->addBodyParsingMiddleware();
 $app->addRoutingMiddleware();
-$app->addErrorMiddleware(true, true, true);
+$app->addErrorMiddleware(false, true, true);
 $app->add(new Authentication($app->getContainer()->get('database')));
 
 $app->get('/stats', $getStatsHandler);
@@ -64,5 +64,11 @@ $app->put('/boulder/{id}/vote', $putBoulderVoteHandler);
 $app->put('/pwreset/{token}', $putPwResetHandler);
 
 $app->delete('/boulder/{id}', $deleteBoulderHandler);
+
+// Editor
+$app->get('/editor/hold/{id}', $getHoldHandler);
+$app->post('/editor/hold', $postHoldHandler);
+$app->put('/editor/hold/{id}', $putHoldHandler);
+$app->delete('/editor/hold/{id}', $deleteHoldHandler);
 
 $app->run();

@@ -93,6 +93,19 @@ class Hold extends AbstractEntity
         return $holds;
     }
 
+    public static function create(PDO $pdo, int $wallSegment, string $tag, string $attr): ?Hold
+    {
+        $pdo->beginTransaction();
+        $stmt = $pdo->prepare('INSERT INTO hold (wall_segment, tag, attr) VALUES (?, ?, ?)');
+        if ($stmt->execute([$wallSegment, $tag, $attr])) {
+            $id = (int)$pdo->lastInsertId();
+            $pdo->commit();
+            return Hold::load($pdo, $id);
+        }
+        $pdo->rollBack();
+        return null;
+    }
+
     public static function unresolved(int $id): Hold
     {
         return new Hold($id);
@@ -126,6 +139,14 @@ class Hold extends AbstractEntity
             }
         }
         return $holds;
+    }
+
+    public function save(PDO $pdo): bool
+    {
+        if (!$this->resolved) return false;
+
+        $stmt = $pdo->prepare('UPDATE boulder_meta SET name = ?, description = ?, user = ?, date = ? WHERE id = ?');
+        return $stmt->execute([$this->name, $this->description, $this->user->id, $this->date, $this->id]);
     }
 
 }
