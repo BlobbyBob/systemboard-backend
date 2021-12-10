@@ -30,4 +30,9 @@ class Token
      * @var string
      */
     public $token;
+
+    /**
+     * @var bool
+     */
+    public $privileged;
 }

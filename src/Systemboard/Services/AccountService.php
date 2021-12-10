@@ -80,6 +80,7 @@ class AccountService extends AbstractService
                 }
             }
             $token->token = $this->createSession($user);
+            $token->privileged = $user->status > 1;
         }
 
         if (empty($token->token)) {
