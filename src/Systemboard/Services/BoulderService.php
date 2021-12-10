@@ -163,7 +163,7 @@ class BoulderService extends AbstractService
         }
 
         $stmt = $this->pdo->prepare('INSERT IGNORE INTO rating (boulder, user, stars) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE stars = ?');
-        if (!$stmt->execute([$boulder->id, $user->id, $data->rating, $data->rating])) {
+        if (!$stmt->execute([$boulder->id, $user->id, $data->stars, $data->stars])) {
             return DefaultService::internalServerError($request, $response);
         }
 
