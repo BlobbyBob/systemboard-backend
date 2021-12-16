@@ -145,8 +145,8 @@ class Hold extends AbstractEntity
     {
         if (!$this->resolved) return false;
 
-        $stmt = $pdo->prepare('UPDATE boulder_meta SET name = ?, description = ?, user = ?, date = ? WHERE id = ?');
-        return $stmt->execute([$this->name, $this->description, $this->user->id, $this->date, $this->id]);
+        $stmt = $pdo->prepare('UPDATE hold SET tag = ?, attr = ? WHERE id = ?');
+        return $stmt->execute([$this->tag, $this->attr, $this->id]);
     }
 
 }

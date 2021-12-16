@@ -27,6 +27,10 @@ namespace Systemboard\PublicEntity;
 class WallSegment
 {
     /**
+     * @var int
+     */
+    public $id;
+    /**
      * @var string
      */
     public $image;

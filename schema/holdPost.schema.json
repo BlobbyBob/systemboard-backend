@@ -11,13 +11,12 @@
   "properties": {
     "wallSegment": {
       "$id": "#/properties/wallSegment",
-      "type": "integer",
+      "type": "string",
       "title": "wallSegment",
-      "description": "ID of the wall segment ",
+      "description": "Filename of the wall segment",
       "examples": [
-        8
-      ],
-      "minimum": 1
+        "centerws16.jpg"
+      ]
     },
     "tag": {
       "$id": "#/properties/tag",

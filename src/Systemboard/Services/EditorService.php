@@ -30,6 +30,7 @@ use Slim\Psr7\Request;
 use Slim\Psr7\Response;
 use Systemboard\Entity\Hold;
 use Systemboard\Entity\User;
+use Systemboard\Entity\WallSegment;
 use Systemboard\PublicEntity\Hold as PublicHold;
 
 class EditorService extends AbstractService
@@ -96,7 +97,12 @@ class EditorService extends AbstractService
             return DefaultService::badRequest($request, $response);
         }
 
-        $hold = Hold::create($this->pdo, $data->wallSegment, $data->tag, $data->attr);
+        $wallsegment = WallSegment::loadByFilename($this->pdo, $data->wallSegment);
+        if (!$wallsegment) {
+            return DefaultService::badRequest($request, $response);
+        }
+
+        $hold = Hold::create($this->pdo, $wallsegment->id, $data->tag, $data->attr);
         if (is_null($hold)) {
             return DefaultService::badRequest($request, $response);
         }
@@ -126,7 +132,7 @@ class EditorService extends AbstractService
         }
 
         $data = json_decode($request->getBody()->getContents());
-        $schema = Schema::fromJsonString(file_get_contents('./schema/holdPost.schema.json'));
+        $schema = Schema::fromJsonString(file_get_contents('./schema/holdPut.schema.json'));
         $validator = new Validator();
         $result = $validator->schemaValidation($data, $schema);
 
